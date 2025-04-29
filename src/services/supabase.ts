@@ -1,20 +1,10 @@
 
-import { createClient } from '@supabase/supabase-js';
-
-// This is where we would set up the Supabase client with your credentials
-// These would need to be replaced with your actual Supabase credentials
-
-// For demo purposes, we're using placeholders
-// Once you connect your Lovable project to Supabase, update these with your actual credentials
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_SUPABASE_KEY';
-
-export const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '@/integrations/supabase/client';
 
 // Example functions to fetch data from Supabase tables
 export const fetchDiseases = async () => {
   const { data, error } = await supabase
-    .from('Disease')
+    .from('disease')
     .select('*');
   
   if (error) throw error;
@@ -23,9 +13,9 @@ export const fetchDiseases = async () => {
 
 export const fetchDiseaseById = async (id: number) => {
   const { data, error } = await supabase
-    .from('Disease')
+    .from('disease')
     .select('*')
-    .eq('Disease_ID', id)
+    .eq('disease_id', id)
     .single();
   
   if (error) throw error;
@@ -34,7 +24,7 @@ export const fetchDiseaseById = async (id: number) => {
 
 export const fetchDoctors = async () => {
   const { data, error } = await supabase
-    .from('Doctors')
+    .from('doctors')
     .select('*');
   
   if (error) throw error;
@@ -43,18 +33,18 @@ export const fetchDoctors = async () => {
 
 export const fetchDoctorsByDisease = async (diseaseId: number) => {
   const { data, error } = await supabase
-    .from('Treated_By')
-    .select('Doctor_ID')
-    .eq('Disease_ID', diseaseId);
+    .from('treated_by')
+    .select('doctor_id')
+    .eq('disease_id', diseaseId);
   
   if (error) throw error;
   
   if (data && data.length > 0) {
-    const doctorIds = data.map(item => item.Doctor_ID);
+    const doctorIds = data.map(item => item.doctor_id);
     const { data: doctors, error: doctorsError } = await supabase
-      .from('Doctors')
+      .from('doctors')
       .select('*')
-      .in('Doctor_ID', doctorIds);
+      .in('doctor_id', doctorIds);
     
     if (doctorsError) throw doctorsError;
     return doctors;
@@ -65,8 +55,8 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
 
 export const fetchMedicines = async () => {
   const { data, error } = await supabase
-    .from('Medicines')
-    .select('*, Disease:Disease_ID(Name), Company:Company_ID(Name)');
+    .from('medicines')
+    .select('*, disease:disease_id(name), companies:company_id(name)');
   
   if (error) throw error;
   return data;
@@ -74,9 +64,9 @@ export const fetchMedicines = async () => {
 
 export const fetchMedicinesByDisease = async (diseaseId: number) => {
   const { data, error } = await supabase
-    .from('Medicines')
-    .select('*, Company:Company_ID(Name)')
-    .eq('Disease_ID', diseaseId);
+    .from('medicines')
+    .select('*, companies:company_id(name)')
+    .eq('disease_id', diseaseId);
   
   if (error) throw error;
   return data;
@@ -84,7 +74,7 @@ export const fetchMedicinesByDisease = async (diseaseId: number) => {
 
 export const fetchPharmacies = async () => {
   const { data, error } = await supabase
-    .from('Pharmacies')
+    .from('pharmacies')
     .select('*');
   
   if (error) throw error;
@@ -93,9 +83,9 @@ export const fetchPharmacies = async () => {
 
 export const fetchStockByPharmacy = async (pharmacyId: number) => {
   const { data, error } = await supabase
-    .from('Stock')
-    .select('*, Medicine:Medicine_ID(*)')
-    .eq('Pharmacy_ID', pharmacyId);
+    .from('stock')
+    .select('*, medicines:medicine_id(*)')
+    .eq('pharmacy_id', pharmacyId);
   
   if (error) throw error;
   return data;
@@ -103,9 +93,9 @@ export const fetchStockByPharmacy = async (pharmacyId: number) => {
 
 export const fetchStockByMedicine = async (medicineId: number) => {
   const { data, error } = await supabase
-    .from('Stock')
-    .select('*, Pharmacy:Pharmacy_ID(*)')
-    .eq('Medicine_ID', medicineId);
+    .from('stock')
+    .select('*, pharmacies:pharmacy_id(*)')
+    .eq('medicine_id', medicineId);
   
   if (error) throw error;
   return data;
@@ -113,7 +103,7 @@ export const fetchStockByMedicine = async (medicineId: number) => {
 
 export const fetchCompositions = async () => {
   const { data, error } = await supabase
-    .from('Compositions')
+    .from('compositions')
     .select('*');
   
   if (error) throw error;
@@ -122,9 +112,9 @@ export const fetchCompositions = async () => {
 
 export const fetchMedicineCompositions = async (medicineId: number) => {
   const { data, error } = await supabase
-    .from('Medicine_Compositions')
-    .select('*, Composition:Composition_ID(*)')
-    .eq('Medicine_ID', medicineId);
+    .from('medicine_compositions')
+    .select('*, compositions:composition_id(*)')
+    .eq('medicine_id', medicineId);
   
   if (error) throw error;
   return data;
@@ -132,7 +122,7 @@ export const fetchMedicineCompositions = async (medicineId: number) => {
 
 export const fetchCompanies = async () => {
   const { data, error } = await supabase
-    .from('Companies')
+    .from('companies')
     .select('*');
   
   if (error) throw error;

@@ -20,6 +20,13 @@ interface MedicineCardProps {
 const MedicineCard = ({ medicine }: MedicineCardProps) => {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+      <div className="w-full h-40 bg-gray-100 overflow-hidden">
+        <img 
+          src={medicine.image || 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=500&q=80'} 
+          alt={medicine.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
