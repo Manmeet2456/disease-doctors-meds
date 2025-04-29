@@ -1,6 +1,27 @@
 
 import React, { useEffect, useRef } from 'react';
 
+// Add TypeScript declaration for the google global namespace
+declare global {
+  interface Window {
+    google: {
+      maps: {
+        Map: typeof google.maps.Map;
+        MapOptions: google.maps.MapOptions;
+        Marker: typeof google.maps.Marker;
+        LatLngBounds: typeof google.maps.LatLngBounds;
+        InfoWindow: typeof google.maps.InfoWindow;
+        Animation: {
+          DROP: number;
+        };
+        SymbolPath: {
+          CIRCLE: number;
+        };
+      };
+    };
+  }
+}
+
 interface GoogleMapProps {
   apiKey: string;
   locations: {
