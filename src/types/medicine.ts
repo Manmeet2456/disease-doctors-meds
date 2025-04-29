@@ -11,7 +11,7 @@ export interface Medicine {
     name: string;
   } | null;
   company_id: number | null;
-  companies: { 
+  company: { 
     company_id: number;
     name: string;
   } | null;

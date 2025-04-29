@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // Example functions to fetch data from Supabase tables
@@ -54,13 +53,13 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
 };
 
 export const fetchMedicines = async () => {
-  // Use specific column names in the join to avoid ambiguity
+  // Fix the query to properly name the joins to avoid ambiguity
   const { data, error } = await supabase
     .from('medicines')
     .select(`
       *,
       disease:disease_id(disease_id, name),
-      companies:company_id(company_id, name)
+      company:company_id(company_id, name)
     `);
   
   if (error) {
@@ -68,18 +67,18 @@ export const fetchMedicines = async () => {
     throw error;
   }
   
-  // Ensure proper structure even if the join fails
+  // Transform the data to match our Medicine interface
   return data?.map(medicine => ({
     ...medicine,
     disease: medicine.disease || null,
-    companies: medicine.companies || null
+    company: medicine.company || null
   })) || [];
 };
 
 export const fetchMedicinesByDisease = async (diseaseId: number) => {
   const { data, error } = await supabase
     .from('medicines')
-    .select('*, companies:company_id(name)')
+    .select('*, company:company_id(name)')
     .eq('disease_id', diseaseId);
   
   if (error) throw error;

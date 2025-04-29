@@ -32,7 +32,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
       result = result.filter(medicine => 
         medicine.name.toLowerCase().includes(term) || 
         (medicine.disease && medicine.disease.name && medicine.disease.name.toLowerCase().includes(term)) || 
-        (medicine.companies && medicine.companies.name && medicine.companies.name.toLowerCase().includes(term))
+        (medicine.company && medicine.company.name && medicine.company.name.toLowerCase().includes(term))
       );
     }
     
@@ -122,7 +122,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
                 price: medicine.price || 0,
                 rank: medicine.rank || 0,
                 disease: medicine.disease?.name || 'Not specified',
-                company: medicine.companies?.name || 'Unknown',
+                company: medicine.company?.name || 'Unknown',
                 image: getMedicineImage(index)
               }} 
             />
