@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 // Example functions to fetch data from Supabase tables
@@ -53,7 +54,7 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
 };
 
 export const fetchMedicines = async () => {
-  // Fix the query to properly name the joins to avoid ambiguity
+  // Explicitly specify the foreign key column in the join
   const { data, error } = await supabase
     .from('medicines')
     .select(`
