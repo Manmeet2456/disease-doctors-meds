@@ -15,15 +15,15 @@ import { toast } from '@/components/ui/use-toast';
 interface Medicine {
   medicine_id: number;
   name: string;
-  type: string;
-  price: number;
-  rank: number;
-  disease_id: number;
+  type: string | null;
+  price: number | null;
+  rank: number | null;
+  disease_id: number | null;
   disease: { 
     disease_id: number;
     name: string;
   } | null;
-  company_id: number;
+  company_id: number | null;
   companies: { 
     company_id: number;
     name: string;
@@ -100,8 +100,8 @@ const Medicines = () => {
       const term = filters.searchTerm.toLowerCase();
       result = result.filter(medicine => 
         medicine.name.toLowerCase().includes(term) || 
-        (medicine.disease?.name && medicine.disease.name.toLowerCase().includes(term)) || 
-        (medicine.companies?.name && medicine.companies.name.toLowerCase().includes(term))
+        (medicine.disease && medicine.disease.name && medicine.disease.name.toLowerCase().includes(term)) || 
+        (medicine.companies && medicine.companies.name && medicine.companies.name.toLowerCase().includes(term))
       );
     }
     
@@ -116,7 +116,7 @@ const Medicines = () => {
     if (filters.priceRange) {
       const [min, max] = filters.priceRange;
       result = result.filter(medicine => 
-        medicine.price >= min && medicine.price <= max
+        medicine.price !== null && medicine.price >= min && medicine.price <= max
       );
     }
     
