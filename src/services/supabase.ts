@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // Example functions to fetch data from Supabase tables
@@ -54,9 +53,14 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
 };
 
 export const fetchMedicines = async () => {
+  // Fix the query by specifying the column name for disease relationship
   const { data, error } = await supabase
     .from('medicines')
-    .select('*, disease:disease_id(name), companies:company_id(name)');
+    .select(`
+      *,
+      disease:disease_id(disease_id, name),
+      companies:company_id(company_id, name)
+    `);
   
   if (error) throw error;
   return data;

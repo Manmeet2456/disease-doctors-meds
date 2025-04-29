@@ -19,9 +19,15 @@ interface Medicine {
   price: number;
   rank: number;
   disease_id: number;
-  disease: { name: string } | null;
+  disease: { 
+    disease_id: number;
+    name: string;
+  } | null;
   company_id: number;
-  companies: { name: string } | null;
+  companies: { 
+    company_id: number;
+    name: string;
+  } | null;
 }
 
 interface Composition {
