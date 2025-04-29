@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Brain, Lungs, Activity } from 'lucide-react';
+import { Heart, Brain, Activity } from 'lucide-react';
 
 const categories = [
   {
@@ -26,7 +26,7 @@ const categories = [
     id: 3,
     name: 'Respiratory',
     description: 'Lung and breathing conditions',
-    icon: Lungs,
+    icon: Activity, // Changed from Lungs to Activity
     color: 'text-teal-500',
     bgColor: 'bg-teal-100',
     link: '/diseases?category=respiratory'
