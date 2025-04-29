@@ -54,7 +54,7 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
 };
 
 export const fetchMedicines = async () => {
-  // Use specific foreign key column names in the join to avoid ambiguity
+  // Use specific column names in the join to avoid ambiguity
   const { data, error } = await supabase
     .from('medicines')
     .select(`
