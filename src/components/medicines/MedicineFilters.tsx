@@ -31,7 +31,7 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
     queryFn: fetchCompositions
   });
   
-  // Fixed query to use proper syntax without onSuccess in the options object
+  // Fixed query to use proper syntax without onSuccess
   const { data: fetchedMaxPrice } = useQuery({
     queryKey: ['maxMedicinePrice'],
     queryFn: fetchMaxMedicinePrice
@@ -157,7 +157,7 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => setPriceRange([0, maxPrice])}
+              onClick={() => setPriceRange([0, priceRange[1]])}
               className="w-12 h-8"
             >
               $0

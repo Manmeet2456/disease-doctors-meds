@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface PharmacyCardProps {
   pharmacy: {
@@ -50,7 +51,9 @@ const PharmacyCard = ({ pharmacy }: PharmacyCardProps) => {
         </div>
       </CardContent>
       <CardFooter className="flex flex-col space-y-2">
-        <Button variant="outline" className="w-full">View Inventory</Button>
+        <Link to={`/pharmacies/${pharmacy.id}`} className="w-full">
+          <Button variant="outline" className="w-full">View Inventory</Button>
+        </Link>
         <Button className="w-full">Get Directions</Button>
       </CardFooter>
     </Card>

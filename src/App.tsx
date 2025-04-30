@@ -11,6 +11,7 @@ import Doctors from "./pages/Doctors";
 import Medicines from "./pages/Medicines";
 import MedicineDetail from "./pages/MedicineDetail";
 import Pharmacies from "./pages/Pharmacies";
+import PharmacyDetail from "./pages/PharmacyDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/medicines" element={<Medicines />} />
           <Route path="/medicines/:id" element={<MedicineDetail />} />
           <Route path="/pharmacies" element={<Pharmacies />} />
+          <Route path="/pharmacies/:id" element={<PharmacyDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />

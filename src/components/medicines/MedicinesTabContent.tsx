@@ -72,10 +72,53 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
     
     // If we have a composition filter
     if (filters.composition && filters.composition !== 'all') {
-      // If we're filtering by composition, fetch from backend
-      if (medicinesByComposition) {
-        result = [...medicinesByComposition];
-      }
+      // Fetch medicines by composition directly from API
+      const compositionIdToUse = parseInt(filters.composition);
+      
+      // Use the fetchMedicinesByComposition function directly
+      fetchMedicinesByComposition(compositionIdToUse)
+        .then(compositionMedicines => {
+          if (compositionMedicines) {
+            // Apply remaining filters to these composition-specific medicines
+            let filteredResult = [...compositionMedicines];
+            
+            // Apply search term filter
+            if (filters.searchTerm) {
+              const term = filters.searchTerm.toLowerCase();
+              filteredResult = filteredResult.filter(medicine => 
+                medicine.name.toLowerCase().includes(term) || 
+                (medicine.disease?.name && medicine.disease.name.toLowerCase().includes(term)) || 
+                (medicine.company?.name && medicine.company.name.toLowerCase().includes(term))
+              );
+            }
+            
+            // Apply type filter
+            if (filters.type && filters.type !== 'all') {
+              filteredResult = filteredResult.filter(medicine => 
+                medicine.type && medicine.type.toLowerCase() === filters.type.toLowerCase()
+              );
+            }
+            
+            // Apply price range filter
+            if (filters.priceRange) {
+              const [min, max] = filters.priceRange;
+              filteredResult = filteredResult.filter(medicine => 
+                medicine.price !== null && medicine.price >= min && medicine.price <= max
+              );
+            }
+            
+            // Apply sorting
+            applySorting(filteredResult, filters.sortBy);
+            
+            setFilteredMedicines(filteredResult);
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching medicines by composition:", error);
+        });
+      
+      // Return early since we're fetching data asynchronously
+      return;
     }
     
     // Apply search term filter
@@ -104,32 +147,35 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
     }
     
     // Apply sorting
-    if (filters.sortBy) {
-      switch (filters.sortBy) {
-        case 'name-asc':
-          result.sort((a, b) => a.name.localeCompare(b.name));
-          break;
-        case 'name-desc':
-          result.sort((a, b) => b.name.localeCompare(a.name));
-          break;
-        case 'price-asc':
-          result.sort((a, b) => (a.price || 0) - (b.price || 0));
-          break;
-        case 'price-desc':
-          result.sort((a, b) => (b.price || 0) - (a.price || 0));
-          break;
-        case 'rank-asc':
-          result.sort((a, b) => (a.rank || 0) - (b.rank || 0));
-          break;
-        case 'rank-desc':
-          result.sort((a, b) => (b.rank || 0) - (a.rank || 0));
-          break;
-        default:
-          break;
-      }
-    }
+    applySorting(result, filters.sortBy);
     
     setFilteredMedicines(result);
+  };
+
+  // Helper function to apply sorting consistently
+  const applySorting = (medicineArray: Medicine[], sortOption: string) => {
+    switch (sortOption) {
+      case 'name-asc':
+        medicineArray.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        medicineArray.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'price-asc':
+        medicineArray.sort((a, b) => (a.price || 0) - (b.price || 0));
+        break;
+      case 'price-desc':
+        medicineArray.sort((a, b) => (b.price || 0) - (a.price || 0));
+        break;
+      case 'rank-asc':
+        medicineArray.sort((a, b) => (a.rank || 0) - (b.rank || 0));
+        break;
+      case 'rank-desc':
+        medicineArray.sort((a, b) => (b.rank || 0) - (a.rank || 0));
+        break;
+      default:
+        break;
+    }
   };
 
   // Random medical images for medicines
