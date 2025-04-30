@@ -1,9 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DiseaseFiltersProps {
   onFilterChange: (filters: any) => void;
@@ -13,6 +15,31 @@ const DiseaseFilters = ({ onFilterChange }: DiseaseFiltersProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
   const [category, setCategory] = useState('all');
+  const [categories, setCategories] = useState<string[]>([]);
+
+  const { data: categoriesData } = useQuery({
+    queryKey: ['diseaseCategories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('disease')
+        .select('category')
+        .not('category', 'is', null);
+      
+      if (error) throw error;
+      
+      // Extract unique categories
+      const allCategories = data.map(item => item.category);
+      const uniqueCategories = Array.from(new Set(allCategories)).filter(Boolean);
+      
+      return uniqueCategories;
+    }
+  });
+
+  useEffect(() => {
+    if (categoriesData) {
+      setCategories(categoriesData);
+    }
+  }, [categoriesData]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -58,11 +85,9 @@ const DiseaseFilters = ({ onFilterChange }: DiseaseFiltersProps) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="cardiovascular">Cardiovascular</SelectItem>
-              <SelectItem value="neurological">Neurological</SelectItem>
-              <SelectItem value="respiratory">Respiratory</SelectItem>
-              <SelectItem value="digestive">Digestive</SelectItem>
-              <SelectItem value="chronic">Chronic</SelectItem>
+              {categories.map((cat) => (
+                <SelectItem key={cat} value={cat.toLowerCase()}>{cat}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

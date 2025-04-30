@@ -9,6 +9,7 @@ import Diseases from "./pages/Diseases";
 import DiseaseDetail from "./pages/DiseaseDetail";
 import Doctors from "./pages/Doctors";
 import Medicines from "./pages/Medicines";
+import MedicineDetail from "./pages/MedicineDetail";
 import Pharmacies from "./pages/Pharmacies";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/diseases/:id" element={<DiseaseDetail />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/medicines" element={<Medicines />} />
+          <Route path="/medicines/:id" element={<MedicineDetail />} />
           <Route path="/pharmacies" element={<Pharmacies />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />

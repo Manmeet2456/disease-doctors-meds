@@ -2,21 +2,24 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
-import { User, PillIcon, MapPin } from 'lucide-react';
+import { User, PillIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface DiseaseDetailProps {
   disease: {
-    id: number;
+    disease_id: number;
     name: string;
-    description: string;
-    symptoms: string;
+    description: string | null;
+    symptoms: string | null;
+    treatment: string | null;
+    category: string;
     image?: string;
   };
 }
 
 const DiseaseDetail = ({ disease }: DiseaseDetailProps) => {
-  const symptomsList = disease.symptoms.split(', ');
+  const symptomsList = disease.symptoms ? disease.symptoms.split(', ') : [];
+  const treatmentsList = disease.treatment ? disease.treatment.split(',') : [];
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -35,13 +38,13 @@ const DiseaseDetail = ({ disease }: DiseaseDetailProps) => {
           <h1 className="text-3xl font-bold mb-4">{disease.name}</h1>
           
           <div className="flex flex-wrap gap-4 mb-8">
-            <Link to={`/doctors?disease=${disease.id}`}>
+            <Link to={`/doctors?disease=${disease.disease_id}`}>
               <Button className="flex items-center gap-2">
                 <User className="h-5 w-5" />
                 Find Specialists
               </Button>
             </Link>
-            <Link to={`/medicines?disease=${disease.id}`}>
+            <Link to={`/medicines?disease=${disease.disease_id}`}>
               <Button variant="outline" className="flex items-center gap-2">
                 <PillIcon className="h-5 w-5" />
                 View Treatments
@@ -57,39 +60,54 @@ const DiseaseDetail = ({ disease }: DiseaseDetailProps) => {
             </TabsList>
             <TabsContent value="overview" className="mt-6">
               <div className="prose max-w-none">
-                <p className="text-gray-700 leading-relaxed">{disease.description}</p>
+                <p className="text-gray-700 leading-relaxed">{disease.description || 'No description available.'}</p>
               </div>
             </TabsContent>
             <TabsContent value="symptoms" className="mt-6">
               <h3 className="text-xl font-semibold mb-4">Common Symptoms</h3>
-              <ul className="list-disc list-inside space-y-2">
-                {symptomsList.map((symptom, index) => (
-                  <li key={index} className="text-gray-700">{symptom}</li>
-                ))}
-              </ul>
+              {symptomsList.length > 0 ? (
+                <ul className="list-disc list-inside space-y-2">
+                  {symptomsList.map((symptom, index) => (
+                    <li key={index} className="text-gray-700">{symptom.trim()}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-700">No symptoms information available.</p>
+              )}
             </TabsContent>
             <TabsContent value="treatments" className="mt-6">
               <h3 className="text-xl font-semibold mb-4">Available Treatments</h3>
               <p className="text-gray-700 mb-4">
                 Various treatments are available for {disease.name}. Please consult with healthcare professionals for personalized advice.
               </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-                <h4 className="font-semibold text-blue-800 mb-2">Common Treatment Approaches:</h4>
-                <ul className="list-disc list-inside text-blue-700 space-y-1">
-                  <li>Medication therapy</li>
-                  <li>Lifestyle modifications</li>
-                  <li>Medical procedures (if applicable)</li>
-                  <li>Regular monitoring and follow-ups</li>
-                </ul>
-              </div>
+              {treatmentsList.length > 0 ? (
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+                  <h4 className="font-semibold text-blue-800 mb-2">Common Treatment Approaches:</h4>
+                  <ul className="list-disc list-inside text-blue-700 space-y-1">
+                    {treatmentsList.map((treatment, index) => (
+                      <li key={index}>{treatment.trim()}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+                  <h4 className="font-semibold text-blue-800 mb-2">Common Treatment Approaches:</h4>
+                  <ul className="list-disc list-inside text-blue-700 space-y-1">
+                    <li>Medication therapy</li>
+                    <li>Lifestyle modifications</li>
+                    <li>Medical procedures (if applicable)</li>
+                    <li>Regular monitoring and follow-ups</li>
+                  </ul>
+                </div>
+              )}
               <div className="flex justify-between items-center">
-                <Link to={`/medicines?disease=${disease.id}`}>
+                <Link to={`/medicines?disease=${disease.disease_id}`}>
                   <Button variant="outline" className="flex items-center gap-2">
                     <PillIcon className="h-5 w-5" />
                     View Recommended Medicines
                   </Button>
                 </Link>
-                <Link to={`/doctors?disease=${disease.id}`}>
+                <Link to={`/doctors?disease=${disease.disease_id}`}>
                   <Button className="flex items-center gap-2">
                     <User className="h-5 w-5" />
                     Find Specialists

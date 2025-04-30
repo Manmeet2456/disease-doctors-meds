@@ -1,10 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, X } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { useQuery } from '@tanstack/react-query';
+import { fetchMedicineTypes, fetchCompositions, fetchMaxMedicinePrice } from '@/services/supabase';
+import { toast } from '@/components/ui/use-toast';
 
 interface MedicineFiltersProps {
   onFilterChange: (filters: any) => void;
@@ -14,8 +17,28 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
   const [type, setType] = useState('all');
-  const [priceRange, setPriceRange] = useState([0, 100]);
+  const [priceRange, setPriceRange] = useState<number[]>([0, 100]);
   const [composition, setComposition] = useState('all');
+  const [maxPrice, setMaxPrice] = useState(100);
+  
+  const { data: medicineTypes = [] } = useQuery({
+    queryKey: ['medicineTypes'],
+    queryFn: fetchMedicineTypes
+  });
+
+  const { data: compositions = [] } = useQuery({
+    queryKey: ['compositions'],
+    queryFn: fetchCompositions
+  });
+  
+  const { data: fetchedMaxPrice } = useQuery({
+    queryKey: ['maxMedicinePrice'],
+    queryFn: fetchMaxMedicinePrice,
+    onSuccess: (data) => {
+      setMaxPrice(data || 100);
+      setPriceRange([0, data || 100]);
+    }
+  });
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -46,11 +69,37 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
       composition
     });
   };
+  
+  const resetFilters = () => {
+    setSearchTerm('');
+    setSortBy('name-asc');
+    setType('all');
+    setPriceRange([0, maxPrice]);
+    setComposition('all');
+    
+    onFilterChange({
+      searchTerm: '',
+      sortBy: 'name-asc',
+      type: 'all',
+      priceRange: [0, maxPrice],
+      composition: 'all'
+    });
+    
+    toast({
+      title: "Filters Reset",
+      description: "All filters have been cleared.",
+    });
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-      <h3 className="text-lg font-semibold mb-4 flex items-center">
-        <Filter className="h-5 w-5 mr-2" /> Filter Medicines
+      <h3 className="text-lg font-semibold mb-4 flex items-center justify-between">
+        <div className="flex items-center">
+          <Filter className="h-5 w-5 mr-2" /> Filter Medicines
+        </div>
+        <Button variant="ghost" size="sm" onClick={resetFilters} className="flex items-center gap-1">
+          <X className="h-4 w-4" /> Clear Filters
+        </Button>
       </h3>
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -72,12 +121,9 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="tablet">Tablet</SelectItem>
-                <SelectItem value="capsule">Capsule</SelectItem>
-                <SelectItem value="syrup">Syrup</SelectItem>
-                <SelectItem value="inhaler">Inhaler</SelectItem>
-                <SelectItem value="injection">Injection</SelectItem>
-                <SelectItem value="cream">Cream/Gel</SelectItem>
+                {medicineTypes.map((type: string) => (
+                  <SelectItem key={type} value={type.toLowerCase()}>{type}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -103,8 +149,8 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
             <label className="text-sm font-medium">Price Range: ${priceRange[0]} - ${priceRange[1]}</label>
           </div>
           <Slider
-            defaultValue={[0, 100]}
-            max={100}
+            defaultValue={[0, maxPrice]}
+            max={maxPrice}
             step={1}
             value={priceRange}
             onValueChange={handlePriceRangeChange}
@@ -119,11 +165,11 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Compositions</SelectItem>
-              <SelectItem value="paracetamol">Paracetamol</SelectItem>
-              <SelectItem value="ibuprofen">Ibuprofen</SelectItem>
-              <SelectItem value="amoxicillin">Amoxicillin</SelectItem>
-              <SelectItem value="aspirin">Aspirin</SelectItem>
-              <SelectItem value="omeprazole">Omeprazole</SelectItem>
+              {compositions.map((comp: any) => (
+                <SelectItem key={comp.composition_id} value={comp.composition_id.toString()}>
+                  {comp.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

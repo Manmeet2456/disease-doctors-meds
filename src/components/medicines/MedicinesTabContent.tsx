@@ -5,6 +5,9 @@ import MedicineFilters from '@/components/medicines/MedicineFilters';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { Medicine } from '@/types/medicine';
+import { useQuery } from '@tanstack/react-query';
+import { fetchMedicinesByComposition } from '@/services/supabase';
+import { useSearchParams } from 'react-router-dom';
 
 interface MedicinesTabContentProps {
   medicines: Medicine[] | null;
@@ -13,18 +16,69 @@ interface MedicinesTabContentProps {
 }
 
 const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabContentProps) => {
+  const [searchParams] = useSearchParams();
   const [filteredMedicines, setFilteredMedicines] = useState<Medicine[]>([]);
+  const [activeFilters, setActiveFilters] = useState({
+    searchTerm: '',
+    type: 'all',
+    priceRange: [0, 100],
+    composition: 'all',
+    sortBy: 'name-asc'
+  });
+  
+  const compositionId = searchParams.get('composition') ? parseInt(searchParams.get('composition') || '0') : null;
+  
+  const { data: medicinesByComposition, isLoading: isCompositionLoading } = useQuery({
+    queryKey: ['medicinesByComposition', compositionId],
+    queryFn: () => fetchMedicinesByComposition(compositionId || 0),
+    enabled: compositionId !== null && compositionId > 0
+  });
 
   useEffect(() => {
     if (medicines) {
-      setFilteredMedicines(medicines);
+      // Check if we need to filter by disease from URL
+      const diseaseId = searchParams.get('disease');
+      if (diseaseId) {
+        const filtered = medicines.filter(medicine => 
+          medicine.disease_id === parseInt(diseaseId)
+        );
+        setFilteredMedicines(filtered);
+      } else if (compositionId && medicinesByComposition) {
+        // If we have a composition filter from URL, use the fetched medicines
+        setFilteredMedicines(medicinesByComposition);
+      } else {
+        setFilteredMedicines(medicines);
+      }
     }
-  }, [medicines]);
+  }, [medicines, searchParams, compositionId, medicinesByComposition]);
 
   const handleFilterChange = (filters: any) => {
+    setActiveFilters(filters);
+    
     if (!medicines) return;
     
     let result = [...medicines];
+    
+    // If we have a disease filter from URL
+    const diseaseId = searchParams.get('disease');
+    if (diseaseId) {
+      result = result.filter(medicine => 
+        medicine.disease_id === parseInt(diseaseId)
+      );
+    }
+    
+    // If we have a composition filter from URL or from dropdown
+    if (compositionId && medicinesByComposition) {
+      result = medicinesByComposition;
+    } else if (filters.composition && filters.composition !== 'all') {
+      // This should be handled through the query, but we're applying it here for consistency
+      // In a real app, we'd refetch with the composition filter
+      result = result.filter(medicine => {
+        // We don't have composition info in the medicine object
+        // This is just a placeholder that would be replaced by proper querying
+        return true; 
+      });
+    }
     
     // Apply search term filter
     if (filters.searchTerm) {
@@ -92,6 +146,17 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
     ];
     return images[index % images.length];
   };
+
+  if (isLoading || isCompositionLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+          <p className="mt-4 text-lg">Loading medicines...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

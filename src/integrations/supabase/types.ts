@@ -47,22 +47,28 @@ export type Database = {
       }
       disease: {
         Row: {
+          category: string
           description: string | null
           disease_id: number
           name: string
           symptoms: string | null
+          treatment: string | null
         }
         Insert: {
+          category?: string
           description?: string | null
           disease_id?: number
           name: string
           symptoms?: string | null
+          treatment?: string | null
         }
         Update: {
+          category?: string
           description?: string | null
           disease_id?: number
           name?: string
           symptoms?: string | null
+          treatment?: string | null
         }
         Relationships: []
       }
