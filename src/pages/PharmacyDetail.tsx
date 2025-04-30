@@ -17,16 +17,18 @@ const PharmacyDetail = () => {
   const { data: stockItems, isLoading } = useQuery({
     queryKey: ['pharmacyStock', pharmacyId],
     queryFn: () => fetchStockByPharmacy(pharmacyId),
-    onSuccess: (data) => {
-      console.log('Stock data loaded successfully:', data);
-    },
-    onError: (error) => {
-      console.error('Failed to load pharmacy inventory data:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load pharmacy inventory data",
-        variant: "destructive"
-      });
+    meta: {
+      onSuccess: (data: any) => {
+        console.log('Stock data loaded successfully:', data);
+      },
+      onError: (error: Error) => {
+        console.error('Failed to load pharmacy inventory data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load pharmacy inventory data",
+          variant: "destructive"
+        });
+      }
     }
   });
   

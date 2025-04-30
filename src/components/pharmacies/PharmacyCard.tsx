@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 
 interface PharmacyCardProps {
   pharmacy: {
-    id: number;
+    pharmacy_id: number;
     name: string;
     location: string;
     contact_info: string;
@@ -51,7 +51,7 @@ const PharmacyCard = ({ pharmacy }: PharmacyCardProps) => {
         </div>
       </CardContent>
       <CardFooter className="flex flex-col space-y-2">
-        <Link to={`/pharmacies/${pharmacy.id}`} className="w-full">
+        <Link to={`/pharmacies/${pharmacy.pharmacy_id}`} className="w-full">
           <Button variant="outline" className="w-full">View Inventory</Button>
         </Link>
         <Button className="w-full">Get Directions</Button>
