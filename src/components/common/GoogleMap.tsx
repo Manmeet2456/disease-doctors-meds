@@ -2,6 +2,14 @@
 import React, { useEffect, useRef } from 'react';
 import { getGoogleMapsApiKey } from '@/utils/googleMapsHelper';
 
+// Declare the global window interface to include the initGoogleMap function
+declare global {
+  interface Window {
+    google: any;
+    initGoogleMap: () => void;
+  }
+}
+
 interface Location {
   lat: number;
   lng: number;
@@ -73,6 +81,7 @@ const GoogleMap = ({ locations = [], height = '400px', zoom = 13 }: GoogleMapPro
         script.async = true;
         script.defer = true;
         
+        // Define the callback function on the window object
         window.initGoogleMap = () => {
           initMap();
         };

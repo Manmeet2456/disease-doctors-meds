@@ -6,6 +6,13 @@ let googleMapsApiKey = '';
 export const setGoogleMapsApiKey = (apiKey: string) => {
   googleMapsApiKey = apiKey;
   localStorage.setItem('googleMapsApiKey', apiKey);
+  
+  // Remove any existing Google Maps script to ensure a fresh load with the new API key
+  const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+  if (existingScript) {
+    existingScript.parentNode?.removeChild(existingScript);
+    delete window.google;
+  }
 };
 
 // Function to get Google Maps API key

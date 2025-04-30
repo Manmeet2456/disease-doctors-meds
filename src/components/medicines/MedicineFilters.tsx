@@ -31,14 +31,19 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
     queryFn: fetchCompositions
   });
   
+  // Fixed query to use proper syntax without onSuccess in the options object
   const { data: fetchedMaxPrice } = useQuery({
     queryKey: ['maxMedicinePrice'],
-    queryFn: fetchMaxMedicinePrice,
-    onSuccess: (data) => {
-      setMaxPrice(data || 100);
-      setPriceRange([0, data || 100]);
-    }
+    queryFn: fetchMaxMedicinePrice
   });
+  
+  // Use useEffect to set the max price when the data is fetched
+  useEffect(() => {
+    if (fetchedMaxPrice) {
+      setMaxPrice(fetchedMaxPrice || 100);
+      setPriceRange([0, fetchedMaxPrice || 100]);
+    }
+  }, [fetchedMaxPrice]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
