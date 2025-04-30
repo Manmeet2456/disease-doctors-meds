@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Brain, Activity, Lungs } from 'lucide-react';
+import { Heart, Brain, Activity, Stethoscope } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchDiseaseCategories } from '@/services/supabase';
 
@@ -12,7 +12,7 @@ const getCategoryIcon = (categoryName: string) => {
     case 'neurological':
       return { icon: Brain, color: 'text-blue-500', bgColor: 'bg-blue-100' };
     case 'respiratory':
-      return { icon: Lungs, color: 'text-teal-500', bgColor: 'bg-teal-100' };
+      return { icon: Stethoscope, color: 'text-teal-500', bgColor: 'bg-teal-100' };
     default:
       return { icon: Activity, color: 'text-purple-500', bgColor: 'bg-purple-100' };
   }
