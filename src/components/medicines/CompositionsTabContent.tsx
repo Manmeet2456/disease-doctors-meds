@@ -11,7 +11,7 @@ interface CompositionsTabContentProps {
   onExport: () => void;
 }
 
-const CompositionsTabContent = ({ compositions }: CompositionsTabContentProps) => {
+const CompositionsTabContent = ({ compositions, onExport }: CompositionsTabContentProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   
   const filteredCompositions = compositions ? compositions.filter(

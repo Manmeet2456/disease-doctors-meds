@@ -1,38 +1,22 @@
+// This file is kept with minimal functionality since we're removing Google Maps support
+// We're keeping the file to prevent import errors, but removing all functionality
 
-// Store Google Maps API key
-let googleMapsApiKey = '';
-
-// Function to set Google Maps API key
 export const setGoogleMapsApiKey = (apiKey: string) => {
-  googleMapsApiKey = apiKey;
-  localStorage.setItem('googleMapsApiKey', apiKey);
-  
-  // Remove any existing Google Maps script to ensure a fresh load with the new API key
-  const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
-  if (existingScript) {
-    existingScript.parentNode?.removeChild(existingScript);
-    delete window.google;
-  }
+  // Function kept for backward compatibility but no functionality
+  console.warn('Google Maps API support has been removed from this application');
 };
 
-// Function to get Google Maps API key
 export const getGoogleMapsApiKey = (): string => {
-  if (!googleMapsApiKey) {
-    googleMapsApiKey = localStorage.getItem('googleMapsApiKey') || '';
-  }
-  return googleMapsApiKey;
+  // Return empty string as Google Maps support is removed
+  return '';
 };
 
-// Function to determine if we have a valid Google Maps API key
 export const hasValidGoogleMapsApiKey = (): boolean => {
-  const apiKey = getGoogleMapsApiKey();
-  return apiKey !== null && apiKey.length > 0;
+  // Always return false as Google Maps support is removed
+  return false;
 };
 
-// Function to format coordinates for Google Maps
 export const formatCoordinates = (lat: number | null, lng: number | null) => {
-  if (lat === null || lng === null) {
-    return { lat: 0, lng: 0 };
-  }
-  return { lat, lng };
+  // Return dummy values as Google Maps support is removed
+  return { lat: 0, lng: 0 };
 };

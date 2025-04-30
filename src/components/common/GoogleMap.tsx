@@ -1,14 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
-import { getGoogleMapsApiKey } from '@/utils/googleMapsHelper';
-
-// Declare the global window interface to include the initGoogleMap function
-declare global {
-  interface Window {
-    google: any;
-    initGoogleMap: () => void;
-  }
-}
+import React from 'react';
 
 interface Location {
   lat: number;
@@ -23,92 +14,14 @@ interface GoogleMapProps {
   zoom?: number;
 }
 
+// This component is disabled as Google Maps API support is removed
 const GoogleMap = ({ locations = [], height = '400px', zoom = 13 }: GoogleMapProps) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null);
-
-  useEffect(() => {
-    // Function to initialize the map
-    const initMap = () => {
-      if (!window.google || !mapRef.current) return;
-
-      // Default center (first location or San Francisco)
-      const center = locations.length > 0 ? 
-        { lat: locations[0].lat, lng: locations[0].lng } : 
-        { lat: 37.7749, lng: -122.4194 }; // San Francisco
-
-      // Create the map instance
-      mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
-        center,
-        zoom,
-        disableDefaultUI: false,
-        zoomControl: true,
-        streetViewControl: false,
-        mapTypeControl: false,
-      });
-
-      // Add markers for each location
-      locations.forEach(location => {
-        const marker = new window.google.maps.Marker({
-          position: { lat: location.lat, lng: location.lng },
-          map: mapInstanceRef.current,
-          title: location.title || '',
-        });
-
-        if (location.title) {
-          const infoWindow = new window.google.maps.InfoWindow({
-            content: `<div><strong>${location.title}</strong></div>`
-          });
-
-          marker.addListener('click', () => {
-            infoWindow.open({
-              anchor: marker,
-              map: mapInstanceRef.current,
-            });
-          });
-        }
-      });
-    };
-
-    // Load Google Maps API if not already loaded
-    const loadGoogleMaps = () => {
-      const key = getGoogleMapsApiKey();
-      if (!key) return;
-      
-      if (!window.google) {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&callback=initGoogleMap`;
-        script.async = true;
-        script.defer = true;
-        
-        // Define the callback function on the window object
-        window.initGoogleMap = () => {
-          initMap();
-        };
-        
-        document.head.appendChild(script);
-        return () => {
-          document.head.removeChild(script);
-          delete window.initGoogleMap;
-        };
-      } else {
-        initMap();
-      }
-    };
-
-    loadGoogleMaps();
-    
-    // Update the map when locations change
-    if (window.google && mapInstanceRef.current) {
-      initMap();
-    }
-  }, [locations, zoom]);
-
   return (
     <div 
-      ref={mapRef} 
-      style={{ height, width: '100%', borderRadius: '0.5rem', overflow: 'hidden' }}
-    ></div>
+      style={{ height, width: '100%', borderRadius: '0.5rem', overflow: 'hidden', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    >
+      <p className="text-gray-500">Maps functionality has been disabled</p>
+    </div>
   );
 };
 
