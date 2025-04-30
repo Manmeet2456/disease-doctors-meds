@@ -50,11 +50,10 @@ const PharmacyCard = ({ pharmacy }: PharmacyCardProps) => {
           )}
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-2">
+      <CardFooter>
         <Link to={`/pharmacies/${pharmacy.pharmacy_id}`} className="w-full">
           <Button variant="outline" className="w-full">View Inventory</Button>
         </Link>
-        <Button className="w-full">Get Directions</Button>
       </CardFooter>
     </Card>
   );

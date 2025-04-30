@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
@@ -5,15 +6,11 @@ import Footer from '@/components/layout/Footer';
 import DoctorCard from '@/components/doctors/DoctorCard';
 import DoctorFilters from '@/components/doctors/DoctorFilters';
 import { useSearchParams } from 'react-router-dom';
-import GoogleMap from '@/components/common/GoogleMap';
-import GoogleMapsApiKeyForm from '@/components/common/GoogleMapsApiKeyForm';
 import { fetchDoctors, fetchDoctorsByDisease } from '@/services/supabase';
-import { getGoogleMapsApiKey } from '@/utils/googleMapsHelper';
 
 const Doctors = () => {
   const [searchParams] = useSearchParams();
   const [filteredDoctors, setFilteredDoctors] = useState<any[]>([]);
-  const [mapLocations, setMapLocations] = useState<any[]>([]);
   
   const diseaseId = searchParams.get('disease') ? parseInt(searchParams.get('disease') || '0') : null;
   
@@ -33,24 +30,8 @@ const Doctors = () => {
   useEffect(() => {
     if (diseaseId && doctorsByDisease) {
       setFilteredDoctors(doctorsByDisease);
-      
-      // Update map locations
-      const locations = doctorsByDisease.map((doctor: any) => ({
-        lat: 37.773972 + Math.random() * 0.03 - 0.015,
-        lng: -122.431297 + Math.random() * 0.03 - 0.015,
-        title: `${doctor.name} - ${doctor.hospital || 'Unknown Hospital'}`
-      }));
-      setMapLocations(locations);
     } else if (allDoctors.length > 0) {
       setFilteredDoctors(allDoctors);
-      
-      // Set all locations for map
-      const locations = allDoctors.map((doctor: any) => ({
-        lat: 37.773972 + Math.random() * 0.03 - 0.015,
-        lng: -122.431297 + Math.random() * 0.03 - 0.015,
-        title: `${doctor.name} - ${doctor.hospital || 'Unknown Hospital'}`
-      }));
-      setMapLocations(locations);
     }
   }, [diseaseId, doctorsByDisease, allDoctors]);
 
@@ -99,14 +80,6 @@ const Doctors = () => {
     }
     
     setFilteredDoctors(result);
-    
-    // Update map locations
-    const locations = result.map(doctor => ({
-      lat: 37.773972 + Math.random() * 0.03 - 0.015,
-      lng: -122.431297 + Math.random() * 0.03 - 0.015,
-      title: `${doctor.name} - ${doctor.hospital || 'Unknown Hospital'}`
-    }));
-    setMapLocations(locations);
   };
 
   // Function to get random images for doctors
@@ -121,9 +94,6 @@ const Doctors = () => {
     ];
     return images[index % images.length];
   };
-
-  // Get Google Maps API key
-  const googleMapsApiKey = getGoogleMapsApiKey();
 
   if (isLoadingAllDoctors || isLoadingByDisease) {
     return (
@@ -150,22 +120,6 @@ const Doctors = () => {
             <p className="text-gray-600">Showing specialists treating the selected condition.</p>
           ) : (
             <p className="text-gray-600">Discover healthcare professionals specializing in various medical conditions.</p>
-          )}
-        </div>
-        
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Doctors in Your Area</h2>
-            <GoogleMapsApiKeyForm />
-          </div>
-          <GoogleMap 
-            apiKey={googleMapsApiKey} 
-            locations={mapLocations}
-          />
-          {!googleMapsApiKey && (
-            <div className="mt-2 text-sm text-gray-500">
-              <p>Please set your Google Maps API key to see accurate doctor locations.</p>
-            </div>
           )}
         </div>
         

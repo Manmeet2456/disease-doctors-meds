@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
@@ -7,11 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter } from 'lucide-react';
-import GoogleMap from '@/components/common/GoogleMap';
-import GoogleMapsApiKeyForm from '@/components/common/GoogleMapsApiKeyForm';
 import { fetchPharmacies, fetchPharmaciesByMedicine } from '@/services/supabase';
 import { useSearchParams } from 'react-router-dom';
-import { getGoogleMapsApiKey } from '@/utils/googleMapsHelper';
 
 const Pharmacies = () => {
   const [searchParams] = useSearchParams();
@@ -78,20 +76,6 @@ const Pharmacies = () => {
     
     setFilteredPharmacies(result);
   };
-  
-  // Get Google Maps API key
-  const googleMapsApiKey = getGoogleMapsApiKey();
-
-  // Format pharmacy data for Google Maps
-  const mapLocations = filteredPharmacies.map(pharmacy => {
-    // For now, we'll use mock coordinates
-    // In a real app, you would use the actual coordinates from the database
-    return {
-      lat: 37.7749 + Math.random() * 0.03 - 0.015,
-      lng: -122.4194 + Math.random() * 0.03 - 0.015,
-      title: pharmacy.name
-    };
-  });
 
   if (isLoading || isLoadingByMedicine) {
     return (
@@ -118,22 +102,6 @@ const Pharmacies = () => {
             <p className="text-gray-600">Showing pharmacies with the selected medicine in stock.</p>
           ) : (
             <p className="text-gray-600">Locate pharmacies near you and check medicine availability.</p>
-          )}
-        </div>
-        
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Pharmacies in Your Area</h2>
-            <GoogleMapsApiKeyForm />
-          </div>
-          <GoogleMap 
-            apiKey={googleMapsApiKey} 
-            locations={mapLocations}
-          />
-          {!googleMapsApiKey && (
-            <div className="mt-2 text-sm text-gray-500">
-              <p>Please set your Google Maps API key to see accurate pharmacy locations.</p>
-            </div>
           )}
         </div>
         
