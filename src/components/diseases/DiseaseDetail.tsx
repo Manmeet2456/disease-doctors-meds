@@ -100,20 +100,6 @@ const DiseaseDetail = ({ disease }: DiseaseDetailProps) => {
                   </ul>
                 </div>
               )}
-              <div className="flex justify-between items-center">
-                <Link to={`/medicines?disease=${disease.disease_id}`}>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <PillIcon className="h-5 w-5" />
-                    View Recommended Medicines
-                  </Button>
-                </Link>
-                <Link to={`/doctors?disease=${disease.disease_id}`}>
-                  <Button className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    Find Specialists
-                  </Button>
-                </Link>
-              </div>
             </TabsContent>
           </Tabs>
         </div>

@@ -57,27 +57,25 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
     
     if (!medicines) return;
     
-    let result = [...medicines];
+    // Start with the appropriate base dataset
+    let result;
     
     // If we have a disease filter from URL
     const diseaseId = searchParams.get('disease');
     if (diseaseId) {
-      result = result.filter(medicine => 
+      result = medicines.filter(medicine => 
         medicine.disease_id === parseInt(diseaseId)
       );
+    } else {
+      result = [...medicines];
     }
     
-    // If we have a composition filter from URL or from dropdown
-    if (compositionId && medicinesByComposition) {
-      result = medicinesByComposition;
-    } else if (filters.composition && filters.composition !== 'all') {
-      // This should be handled through the query, but we're applying it here for consistency
-      // In a real app, we'd refetch with the composition filter
-      result = result.filter(medicine => {
-        // We don't have composition info in the medicine object
-        // This is just a placeholder that would be replaced by proper querying
-        return true; 
-      });
+    // If we have a composition filter
+    if (filters.composition && filters.composition !== 'all') {
+      // If we're filtering by composition, fetch from backend
+      if (medicinesByComposition) {
+        result = [...medicinesByComposition];
+      }
     }
     
     // Apply search term filter
@@ -85,8 +83,8 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
       const term = filters.searchTerm.toLowerCase();
       result = result.filter(medicine => 
         medicine.name.toLowerCase().includes(term) || 
-        (medicine.disease && medicine.disease.name && medicine.disease.name.toLowerCase().includes(term)) || 
-        (medicine.company && medicine.company.name && medicine.company.name.toLowerCase().includes(term))
+        (medicine.disease?.name && medicine.disease.name.toLowerCase().includes(term)) || 
+        (medicine.company?.name && medicine.company.name.toLowerCase().includes(term))
       );
     }
     

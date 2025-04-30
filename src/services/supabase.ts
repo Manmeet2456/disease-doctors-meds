@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // Example functions to fetch data from Supabase tables
@@ -205,6 +204,25 @@ export const fetchCompanies = async () => {
   
   if (error) throw error;
   return data;
+};
+
+// Function to fetch disease categories from the database
+export const fetchDiseaseCategories = async (): Promise<string[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('disease')
+      .select('category')
+      .order('category');
+    
+    if (error) throw error;
+    
+    // Extract unique categories and filter out null/empty values
+    const categories = [...new Set(data.map(item => item.category))].filter(Boolean);
+    return categories;
+  } catch (error) {
+    console.error('Error fetching disease categories:', error);
+    return [];
+  }
 };
 
 // Get all available medicine types from the database

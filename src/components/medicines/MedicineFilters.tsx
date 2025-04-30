@@ -153,14 +153,32 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
           <div className="mb-2">
             <label className="text-sm font-medium">Price Range: ${priceRange[0]} - ${priceRange[1]}</label>
           </div>
-          <Slider
-            defaultValue={[0, maxPrice]}
-            max={maxPrice}
-            step={1}
-            value={priceRange}
-            onValueChange={handlePriceRangeChange}
-            className="my-4"
-          />
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setPriceRange([0, maxPrice])}
+              className="w-12 h-8"
+            >
+              $0
+            </Button>
+            <Slider
+              defaultValue={[0, maxPrice]}
+              max={maxPrice}
+              step={1}
+              value={priceRange}
+              onValueChange={handlePriceRangeChange}
+              className="flex-grow"
+            />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setPriceRange([priceRange[0], maxPrice])}
+              className="w-16 h-8"
+            >
+              ${maxPrice}
+            </Button>
+          </div>
         </div>
         
         <div>
