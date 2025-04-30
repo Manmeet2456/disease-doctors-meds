@@ -54,12 +54,18 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
 };
 
 export const fetchMedicines = async () => {
-  // Explicitly specify the foreign key column in the join
+  // Explicitly specify which foreign key relationship to use
   const { data, error } = await supabase
     .from('medicines')
     .select(`
-      *,
-      disease:disease_id(disease_id, name),
+      medicine_id,
+      name,
+      type,
+      price,
+      rank,
+      disease_id,
+      disease:disease!medicines_disease_id_fkey(disease_id, name),
+      company_id,
       company:company_id(company_id, name)
     `);
   
