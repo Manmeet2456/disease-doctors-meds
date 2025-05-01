@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import MedicineCard from '@/components/medicines/MedicineCard';
 import MedicineFilters from '@/components/medicines/MedicineFilters';
@@ -6,7 +7,7 @@ import { Download, X } from 'lucide-react';
 import { Medicine } from '@/types/medicine';
 import { useQuery } from '@tanstack/react-query';
 import { fetchMedicinesByComposition, fetchMedicinesByCompany } from '@/services/supabase';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 
 interface MedicinesTabContentProps {
@@ -16,7 +17,8 @@ interface MedicinesTabContentProps {
 }
 
 const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabContentProps) => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [filteredMedicines, setFilteredMedicines] = useState<Medicine[]>([]);
   const [activeFilters, setActiveFilters] = useState({
     searchTerm: '',
@@ -59,7 +61,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         }
       } else if (compositionId && medicinesByComposition) {
         // If we have a composition filter from URL, use the fetched medicines
-        setFilteredMedicines(medicinesByComposition);
+        setFilteredMedicines(medicinesByComposition as Medicine[]);
         
         if (medicinesByComposition.length === 0) {
           toast({
@@ -69,7 +71,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         }
       } else if (companyId && medicinesByCompany) {
         // If we have a company filter from URL, use the fetched medicines
-        setFilteredMedicines(medicinesByCompany);
+        setFilteredMedicines(medicinesByCompany as Medicine[]);
         
         if (medicinesByCompany.length === 0) {
           toast({
@@ -111,7 +113,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         .then(compositionMedicines => {
           if (compositionMedicines) {
             // Apply remaining filters to these composition-specific medicines
-            let filteredResult = [...compositionMedicines];
+            let filteredResult = [...compositionMedicines] as Medicine[];
             
             // Apply search term filter
             if (filters.searchTerm) {
@@ -223,6 +225,12 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
   };
 
   const isCustomFiltering = compositionId || companyId || searchParams.get('disease');
+
+  // Clear Filters function (was missing)
+  const clearFilters = () => {
+    // Reset URL params and navigate to medicines tab
+    navigate('/medicines?tab=medicines');
+  };
 
   if (isLoading || isCompositionLoading || isCompanyLoading) {
     return (

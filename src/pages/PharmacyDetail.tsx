@@ -9,6 +9,18 @@ import { MapPin, Phone, Clock, Package } from 'lucide-react';
 import { fetchStockByPharmacy, fetchPharmacyById } from '@/services/supabase';
 import { toast } from '@/components/ui/use-toast';
 
+interface StockItem {
+  stock_id: number;
+  medicine_id: number;
+  quantity: number | null;
+  price_store: number | null;
+  medicines: {
+    medicine_id: number;
+    name: string;
+    type: string | null;
+  } | null;
+}
+
 const PharmacyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const pharmacyId = parseInt(id || '0');
@@ -20,7 +32,7 @@ const PharmacyDetail = () => {
   });
   
   // Fetch pharmacy stock data
-  const { data: stockItems, isLoading: isLoadingStock } = useQuery({
+  const { data: stockItems, isLoading: isLoadingStock } = useQuery<StockItem[]>({
     queryKey: ['pharmacyStock', pharmacyId],
     queryFn: () => fetchStockByPharmacy(pharmacyId),
     meta: {

@@ -140,7 +140,7 @@ const Medicines = () => {
           
           <TabsContent value="medicines">
             <MedicinesTabContent 
-              medicines={medicines as Medicine[] | null}
+              medicines={medicines as Medicine[]}
               isLoading={isLoadingMedicines}
               onExport={handleExport}
             />
@@ -148,14 +148,14 @@ const Medicines = () => {
           
           <TabsContent value="compositions">
             <CompositionsTabContent 
-              compositions={compositions as Composition[] | null}
+              compositions={compositions as Composition[]}
               onExport={handleExport}
             />
           </TabsContent>
           
           <TabsContent value="companies">
             <CompaniesTabContent 
-              companies={companies as Company[] | null}
+              companies={companies as Company[]}
               onExport={handleExport}
             />
           </TabsContent>

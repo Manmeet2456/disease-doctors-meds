@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 // Fetch all diseases
@@ -80,7 +81,7 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
   return data;
 };
 
-// Fetch all medicines
+// Fetch all medicines - fixed query to avoid ambiguity with disease relationship
 export const fetchMedicines = async () => {
   const { data, error } = await supabase
     .from('medicines')
@@ -92,10 +93,12 @@ export const fetchMedicines = async () => {
       rank,
       disease_id,
       disease:disease_id (
+        disease_id,
         name
       ),
       company_id,
       company:company_id (
+        company_id,
         name
       )
     `);
@@ -120,10 +123,12 @@ export const fetchMedicineById = async (id: number) => {
       rank,
       disease_id,
       disease:disease_id (
+        disease_id,
         name
       ),
       company_id,
       company:company_id (
+        company_id,
         name
       )
     `)
@@ -225,10 +230,10 @@ export const fetchCompanies = async () => {
   return data;
 };
 
-// Fetch stock by pharmacy ID
+// Fetch stock by pharmacy ID - fixed to use proper table name
 export const fetchStockByPharmacy = async (pharmacyId: number) => {
   const { data, error } = await supabase
-    .from('pharmacy_stock')
+    .from('stock')
     .select(`
       stock_id,
       medicine_id,
@@ -281,7 +286,7 @@ export const fetchMaxMedicinePrice = async () => {
   return data[0]?.price || 100;
 };
 
-// Fetch medicines by composition
+// Fetch medicines by composition with correct disease selection
 export const fetchMedicinesByComposition = async (compositionId: number) => {
   const { data, error } = await supabase
     .from('medicine_compositions')
@@ -295,10 +300,12 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
         rank,
         disease_id,
         disease:disease_id (
+          disease_id,
           name
         ),
         company_id,
         company:company_id (
+          company_id,
           name
         )
       )
@@ -311,7 +318,7 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   return data.map(item => item.medicines);
 };
 
-// Fetch medicines by company
+// Fetch medicines by company with correct disease selection
 export const fetchMedicinesByCompany = async (companyId: number) => {
   const { data, error } = await supabase
     .from('medicines')
@@ -323,10 +330,12 @@ export const fetchMedicinesByCompany = async (companyId: number) => {
       rank,
       disease_id,
       disease:disease_id (
+        disease_id,
         name
       ),
       company_id,
       company:company_id (
+        company_id,
         name
       )
     `)
