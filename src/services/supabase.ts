@@ -123,7 +123,8 @@ export const fetchMedicines = async (): Promise<Medicine[]> => {
     };
     
     // Check if disease exists and has the expected structure
-    if (item.disease && typeof item.disease === 'object' && 'disease_id' in item.disease && 'name' in item.disease) {
+    if (item.disease && typeof item.disease === 'object' && 
+        'disease_id' in item.disease && 'name' in item.disease) {
       medicineObj.disease = {
         disease_id: item.disease.disease_id,
         name: item.disease.name
@@ -131,7 +132,8 @@ export const fetchMedicines = async (): Promise<Medicine[]> => {
     }
     
     // Check if company exists and has the expected structure
-    if (item.company && typeof item.company === 'object' && 'company_id' in item.company && 'name' in item.company) {
+    if (item.company && typeof item.company === 'object' && 
+        'company_id' in item.company && 'name' in item.company) {
       medicineObj.company = {
         company_id: item.company.company_id,
         name: item.company.name
@@ -185,7 +187,8 @@ export const fetchMedicineById = async (id: number): Promise<Medicine> => {
   };
   
   // Check if disease exists and has the expected structure
-  if (data.disease && typeof data.disease === 'object' && 'disease_id' in data.disease && 'name' in data.disease) {
+  if (data.disease && typeof data.disease === 'object' && 
+      'disease_id' in data.disease && 'name' in data.disease) {
     medicine.disease = {
       disease_id: data.disease.disease_id,
       name: data.disease.name
@@ -193,7 +196,8 @@ export const fetchMedicineById = async (id: number): Promise<Medicine> => {
   }
   
   // Check if company exists and has the expected structure
-  if (data.company && typeof data.company === 'object' && 'company_id' in data.company && 'name' in data.company) {
+  if (data.company && typeof data.company === 'object' && 
+      'company_id' in data.company && 'name' in data.company) {
     medicine.company = {
       company_id: data.company.company_id,
       name: data.company.name
@@ -259,7 +263,9 @@ export const fetchPharmaciesByMedicine = async (medicineId: number) => {
   }
 
   // Transform the data to match the expected format
-  return data.map(item => item.pharmacy).filter(Boolean);
+  return data
+    .map(item => item.pharmacy)
+    .filter(Boolean);
 };
 
 // Fetch all compositions
@@ -381,40 +387,45 @@ export const fetchMedicinesByComposition = async (compositionId: number): Promis
   if (error) throw error;
   
   // Transform the data to match the expected Medicine format
-  return data.map(item => {
-    if (!item.medicine) return null;
-    
-    const medicine = item.medicine;
-    const result: Medicine = {
-      medicine_id: medicine.medicine_id,
-      name: medicine.name,
-      type: medicine.type,
-      price: medicine.price,
-      rank: medicine.rank,
-      disease_id: medicine.disease_id,
-      disease: null,
-      company_id: medicine.company_id,
-      company: null
-    };
-    
-    // Check if disease exists and has the expected structure
-    if (medicine.disease && typeof medicine.disease === 'object' && 'disease_id' in medicine.disease && 'name' in medicine.disease) {
-      result.disease = {
-        disease_id: medicine.disease.disease_id,
-        name: medicine.disease.name
+  return data
+    .filter(item => item.medicine !== null)
+    .map(item => {
+      if (!item.medicine) return null;
+      
+      const medicine = item.medicine;
+      const result: Medicine = {
+        medicine_id: medicine.medicine_id,
+        name: medicine.name,
+        type: medicine.type,
+        price: medicine.price,
+        rank: medicine.rank,
+        disease_id: medicine.disease_id,
+        disease: null,
+        company_id: medicine.company_id,
+        company: null
       };
-    }
-    
-    // Check if company exists and has the expected structure
-    if (medicine.company && typeof medicine.company === 'object' && 'company_id' in medicine.company && 'name' in medicine.company) {
-      result.company = {
-        company_id: medicine.company.company_id,
-        name: medicine.company.name
-      };
-    }
-    
-    return result;
-  }).filter((item): item is Medicine => item !== null);
+      
+      // Check if disease exists and has the expected structure
+      if (medicine.disease && typeof medicine.disease === 'object' &&
+          'disease_id' in medicine.disease && 'name' in medicine.disease) {
+        result.disease = {
+          disease_id: medicine.disease.disease_id,
+          name: medicine.disease.name
+        };
+      }
+      
+      // Check if company exists and has the expected structure
+      if (medicine.company && typeof medicine.company === 'object' &&
+          'company_id' in medicine.company && 'name' in medicine.company) {
+        result.company = {
+          company_id: medicine.company.company_id,
+          name: medicine.company.name
+        };
+      }
+      
+      return result;
+    })
+    .filter((item): item is Medicine => item !== null);
 };
 
 // Fetch medicines by company with fixed relationship selection
@@ -457,7 +468,8 @@ export const fetchMedicinesByCompany = async (companyId: number): Promise<Medici
     };
     
     // Check if disease exists and has the expected structure
-    if (medicine.disease && typeof medicine.disease === 'object' && 'disease_id' in medicine.disease && 'name' in medicine.disease) {
+    if (medicine.disease && typeof medicine.disease === 'object' &&
+        'disease_id' in medicine.disease && 'name' in medicine.disease) {
       result.disease = {
         disease_id: medicine.disease.disease_id,
         name: medicine.disease.name
@@ -465,7 +477,8 @@ export const fetchMedicinesByCompany = async (companyId: number): Promise<Medici
     }
     
     // Check if company exists and has the expected structure
-    if (medicine.company && typeof medicine.company === 'object' && 'company_id' in medicine.company && 'name' in medicine.company) {
+    if (medicine.company && typeof medicine.company === 'object' &&
+        'company_id' in medicine.company && 'name' in medicine.company) {
       result.company = {
         company_id: medicine.company.company_id,
         name: medicine.company.name
