@@ -20,7 +20,6 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
   const [priceRange, setPriceRange] = useState<number[]>([0, 100]);
   const [composition, setComposition] = useState('all');
   const [maxPrice, setMaxPrice] = useState(100);
-  const filtersDivRef = React.useRef<HTMLDivElement>(null);
   
   const { data: medicineTypes = [] } = useQuery({
     queryKey: ['medicineTypes'],
@@ -45,22 +44,6 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
       setPriceRange([0, fetchedMaxPrice || 100]);
     }
   }, [fetchedMaxPrice]);
-  
-  // Add event listener for reset filters
-  useEffect(() => {
-    const handleResetFilters = () => {
-      resetFilters();
-    };
-    
-    const divElement = filtersDivRef.current;
-    if (divElement) {
-      divElement.addEventListener('resetFilters', handleResetFilters);
-      
-      return () => {
-        divElement.removeEventListener('resetFilters', handleResetFilters);
-      };
-    }
-  }, [maxPrice]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -114,7 +97,7 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
   };
 
   return (
-    <div ref={filtersDivRef} data-medicine-filters className="bg-white p-6 rounded-lg shadow-md mb-8">
+    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
       <h3 className="text-lg font-semibold mb-4 flex items-center justify-between">
         <div className="flex items-center">
           <Filter className="h-5 w-5 mr-2" /> Filter Medicines

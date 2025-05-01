@@ -1,13 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import MedicineCard from '@/components/medicines/MedicineCard';
 import MedicineFilters from '@/components/medicines/MedicineFilters';
 import { Button } from '@/components/ui/button';
-import { Download, X } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { Medicine } from '@/types/medicine';
 import { useQuery } from '@tanstack/react-query';
-import { fetchMedicinesByComposition, fetchMedicinesByCompany } from '@/services/supabase';
+import { fetchMedicinesByComposition } from '@/services/supabase';
 import { useSearchParams } from 'react-router-dom';
-import { toast } from '@/components/ui/use-toast';
 
 interface MedicinesTabContentProps {
   medicines: Medicine[] | null;
@@ -27,18 +27,11 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
   });
   
   const compositionId = searchParams.get('composition') ? parseInt(searchParams.get('composition') || '0') : null;
-  const companyId = searchParams.get('company') ? parseInt(searchParams.get('company') || '0') : null;
   
   const { data: medicinesByComposition, isLoading: isCompositionLoading } = useQuery({
     queryKey: ['medicinesByComposition', compositionId],
     queryFn: () => fetchMedicinesByComposition(compositionId || 0),
     enabled: compositionId !== null && compositionId > 0
-  });
-
-  const { data: medicinesByCompany, isLoading: isCompanyLoading } = useQuery({
-    queryKey: ['medicinesByCompany', companyId],
-    queryFn: () => fetchMedicinesByCompany(companyId || 0),
-    enabled: companyId !== null && companyId > 0
   });
 
   useEffect(() => {
@@ -50,38 +43,14 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
           medicine.disease_id === parseInt(diseaseId)
         );
         setFilteredMedicines(filtered);
-        
-        if (filtered.length === 0) {
-          toast({
-            title: "No results",
-            description: "No medicines found for the selected disease.",
-          });
-        }
       } else if (compositionId && medicinesByComposition) {
         // If we have a composition filter from URL, use the fetched medicines
         setFilteredMedicines(medicinesByComposition);
-        
-        if (medicinesByComposition.length === 0) {
-          toast({
-            title: "No results",
-            description: "No medicines found for the selected composition.",
-          });
-        }
-      } else if (companyId && medicinesByCompany) {
-        // If we have a company filter from URL, use the fetched medicines
-        setFilteredMedicines(medicinesByCompany);
-        
-        if (medicinesByCompany.length === 0) {
-          toast({
-            title: "No results",
-            description: "No medicines found for the selected company.",
-          });
-        }
       } else {
         setFilteredMedicines(medicines);
       }
     }
-  }, [medicines, searchParams, compositionId, medicinesByComposition, companyId, medicinesByCompany]);
+  }, [medicines, searchParams, compositionId, medicinesByComposition]);
 
   const handleFilterChange = (filters: any) => {
     setActiveFilters(filters);
@@ -222,9 +191,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
     return images[index % images.length];
   };
 
-  const isCustomFiltering = compositionId || companyId || searchParams.get('disease');
-
-  if (isLoading || isCompositionLoading || isCompanyLoading) {
+  if (isLoading || isCompositionLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
@@ -237,26 +204,12 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
 
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-2">
-          {isCustomFiltering && (
-            <Button variant="outline" className="flex items-center gap-2" onClick={clearFilters}>
-              <X className="h-4 w-4" /> Clear All Filters
-            </Button>
-          )}
-          
+      <div className="flex justify-between items-center mb-2">
+        <div>
           <Button variant="outline" className="flex items-center gap-2" onClick={onExport}>
             <Download className="h-4 w-4" /> Export List
           </Button>
         </div>
-        
-        {isCustomFiltering && (
-          <div className="text-sm text-gray-500">
-            {compositionId && "Filtered by composition"}
-            {companyId && "Filtered by company"}
-            {searchParams.get('disease') && "Filtered by disease"}
-          </div>
-        )}
       </div>
       
       <MedicineFilters onFilterChange={handleFilterChange} />

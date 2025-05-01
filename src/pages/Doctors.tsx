@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
@@ -6,9 +7,6 @@ import DoctorCard from '@/components/doctors/DoctorCard';
 import DoctorFilters from '@/components/doctors/DoctorFilters';
 import { useSearchParams } from 'react-router-dom';
 import { fetchDoctors, fetchDoctorsByDisease } from '@/services/supabase';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
 
 const Doctors = () => {
   const [searchParams] = useSearchParams();
@@ -57,7 +55,7 @@ const Doctors = () => {
     // Apply specialization filter
     if (filters.specialization && filters.specialization !== 'all') {
       result = result.filter(doctor => 
-        doctor.specialization && doctor.specialization.toLowerCase().includes(filters.specialization.toLowerCase())
+        doctor.specialization && doctor.specialization.toLowerCase() === filters.specialization.toLowerCase()
       );
     }
     
@@ -82,22 +80,6 @@ const Doctors = () => {
     }
     
     setFilteredDoctors(result);
-  };
-  
-  const clearFilters = () => {
-    // Reset to unfiltered state but keep disease filter if present
-    if (diseaseId && doctorsByDisease) {
-      setFilteredDoctors(doctorsByDisease);
-    } else {
-      setFilteredDoctors(allDoctors);
-    }
-    
-    // Reset filters in the DoctorFilters component
-    const filtersComponent = document.querySelector("[data-doctor-filters]");
-    if (filtersComponent) {
-      const resetEvent = new CustomEvent('resetFilters');
-      filtersComponent.dispatchEvent(resetEvent);
-    }
   };
 
   // Function to get random images for doctors
@@ -135,12 +117,7 @@ const Doctors = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Find Specialist Doctors</h1>
           {diseaseId ? (
-            <div className="flex items-center justify-between">
-              <p className="text-gray-600">Showing specialists treating the selected condition.</p>
-              <Button variant="outline" size="sm" className="flex items-center gap-1" onClick={clearFilters}>
-                <X className="h-4 w-4" /> Clear Filters
-              </Button>
-            </div>
+            <p className="text-gray-600">Showing specialists treating the selected condition.</p>
           ) : (
             <p className="text-gray-600">Discover healthcare professionals specializing in various medical conditions.</p>
           )}

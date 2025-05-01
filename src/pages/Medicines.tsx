@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -14,15 +14,7 @@ import { Medicine, Composition, Company } from '@/types/medicine';
 
 const Medicines = () => {
   const [searchParams] = useSearchParams();
-  const tabFromUrl = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState(tabFromUrl || "medicines");
-  
-  useEffect(() => {
-    // Update the active tab when URL search params change
-    if (tabFromUrl) {
-      setActiveTab(tabFromUrl);
-    }
-  }, [tabFromUrl]);
+  const [activeTab, setActiveTab] = useState("medicines");
   
   // Fetch medicines data from Supabase
   const { data: medicines, isLoading: isLoadingMedicines, error: medicinesError } = useQuery({

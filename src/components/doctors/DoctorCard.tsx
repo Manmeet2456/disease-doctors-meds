@@ -19,9 +19,6 @@ interface DoctorCardProps {
 
 const DoctorCard = ({ doctor }: DoctorCardProps) => {
   const [showDetails, setShowDetails] = useState(false);
-  
-  // Extract just the name without any title for fixing the Dr. duplication issue
-  const nameWithoutTitle = doctor.name.replace(/^Dr\.\s+/i, '');
 
   return (
     <>
@@ -111,7 +108,7 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
           <div className="mt-4 p-4 bg-gray-50 rounded-lg">
             <h3 className="font-semibold mb-2">Appointment Information</h3>
             <p className="text-gray-600">
-              To schedule an appointment with Dr. {nameWithoutTitle}, please contact 
+              To schedule an appointment with Dr. {doctor.name}, please contact 
               them directly using the provided contact information.
             </p>
           </div>
