@@ -29,11 +29,30 @@ export const fetchDoctors = async (): Promise<Doctor[]> => {
 
 // Fetch doctors by disease ID using the treated_by junction table
 export const fetchDoctorsByDisease = async (diseaseId: number): Promise<Doctor[]> => {
-  // Join with treated_by table to get doctors by disease
+  // First, get doctor IDs from treated_by table for this disease
+  const { data: treatedByData, error: treatedByError } = await supabase
+    .from('treated_by')
+    .select('doctor_id')
+    .eq('disease_id', diseaseId);
+    
+  if (treatedByError) {
+    console.error("Error fetching doctor IDs for disease:", treatedByError);
+    throw treatedByError;
+  }
+  
+  // Extract doctor IDs from the result
+  const doctorIds = treatedByData.map(item => item.doctor_id);
+  
+  // If no doctors treat this disease, return empty array
+  if (doctorIds.length === 0) {
+    return [];
+  }
+  
+  // Now fetch doctor details for these IDs
   const { data, error } = await supabase
     .from('doctors')
     .select('doctor_id, name, specialization, hospital, contact_info, experience_years')
-    .eq('doctor_id', supabase.from('treated_by').select('doctor_id').eq('disease_id', diseaseId));
+    .in('doctor_id', doctorIds);
 
   if (error) {
     console.error("Error fetching doctors by disease:", error);
