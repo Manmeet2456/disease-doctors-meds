@@ -24,6 +24,7 @@ export const fetchDoctors = async (): Promise<Doctor[]> => {
     throw error;
   }
 
+  // Explicitly cast the return value to Doctor[]
   return data as Doctor[];
 };
 
@@ -39,6 +40,7 @@ export const fetchDoctorsByDisease = async (diseaseId: number): Promise<Doctor[]
     throw error;
   }
 
+  // Explicitly cast the return value to Doctor[]
   return data as Doctor[];
 };
 
