@@ -9,14 +9,14 @@ export type Doctor = {
   hospital: string | null;
   contact_info: string | null;
   experience_years: number | null;
-  disease_id?: number | null;
+  // Remove disease_id from the base type as it doesn't exist in the doctors table
 };
 
 // Fetch all doctors
 export const fetchDoctors = async (): Promise<Doctor[]> => {
   const { data, error } = await supabase
     .from('doctors')
-    .select('*');
+    .select('doctor_id, name, specialization, hospital, contact_info, experience_years');
 
   if (error) {
     console.error("Error fetching doctors:", error);
@@ -27,13 +27,13 @@ export const fetchDoctors = async (): Promise<Doctor[]> => {
   return (data || []) as Doctor[];
 };
 
-// Fetch doctors by disease ID
+// Fetch doctors by disease ID using the treated_by junction table
 export const fetchDoctorsByDisease = async (diseaseId: number): Promise<Doctor[]> => {
-  // Explicitly define what we're selecting and the return type
+  // Join with treated_by table to get doctors by disease
   const { data, error } = await supabase
     .from('doctors')
-    .select('doctor_id, name, specialization, hospital, contact_info, experience_years, disease_id')
-    .eq('disease_id', diseaseId);
+    .select('doctor_id, name, specialization, hospital, contact_info, experience_years')
+    .eq('doctor_id', supabase.from('treated_by').select('doctor_id').eq('disease_id', diseaseId));
 
   if (error) {
     console.error("Error fetching doctors by disease:", error);
