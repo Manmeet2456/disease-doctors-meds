@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
@@ -6,7 +5,7 @@ import Footer from '@/components/layout/Footer';
 import DiseaseCard from '@/components/diseases/DiseaseCard';
 import DiseaseFilters from '@/components/diseases/DiseaseFilters';
 import { useSearchParams } from 'react-router-dom';
-import { fetchDiseases } from '@/services/supabase';
+import { fetchDiseases } from '@/services/api/diseases';
 
 const Diseases = () => {
   const [searchParams] = useSearchParams();

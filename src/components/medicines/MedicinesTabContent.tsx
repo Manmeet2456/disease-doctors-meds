@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Download, X } from 'lucide-react';
 import { Medicine } from '@/types/medicine';
 import { useQuery } from '@tanstack/react-query';
-import { fetchMedicinesByComposition, fetchMedicinesByCompany } from '@/services/supabase';
+import { fetchMedicinesByComposition, fetchMedicinesByCompany } from '@/services/api/medicines';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 

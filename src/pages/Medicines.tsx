@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
@@ -7,7 +8,7 @@ import CompositionsTabContent from '@/components/medicines/CompositionsTabConten
 import CompaniesTabContent from '@/components/medicines/CompaniesTabContent';
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchMedicines, fetchCompositions, fetchCompanies } from '@/services/supabase';
+import { fetchMedicines, fetchCompositions, fetchCompanies } from '@/services/api';
 import { toast } from '@/components/ui/use-toast';
 import { Medicine, Composition, Company } from '@/types/medicine';
 

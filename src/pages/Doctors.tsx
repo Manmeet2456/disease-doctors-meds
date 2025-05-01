@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
@@ -5,7 +6,7 @@ import Footer from '@/components/layout/Footer';
 import DoctorCard from '@/components/doctors/DoctorCard';
 import DoctorFilters from '@/components/doctors/DoctorFilters';
 import { useSearchParams } from 'react-router-dom';
-import { fetchDoctors, fetchDoctorsByDisease } from '@/services/supabase';
+import { fetchDoctors, fetchDoctorsByDisease } from '@/services/api/doctors';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';

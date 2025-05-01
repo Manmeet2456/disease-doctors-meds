@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import DiseaseDetail from '@/components/diseases/DiseaseDetail';
-import { fetchDiseaseById } from '@/services/supabase';
+import { fetchDiseaseById } from '@/services/api/diseases';
 
 const DiseaseDetailPage = () => {
   const { id } = useParams();
