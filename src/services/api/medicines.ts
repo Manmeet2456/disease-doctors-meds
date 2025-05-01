@@ -43,15 +43,9 @@ export const fetchMedicines = async (): Promise<Medicine[]> => {
       price,
       rank,
       disease_id,
-      disease:disease_id!disease_id_fk (
-        disease_id,
-        name
-      ),
+      disease:disease_id(disease_id,name),
       company_id,
-      company:company_id (
-        company_id,
-        name
-      )
+      company:company_id(company_id,name)
     `);
 
   if (error) {
@@ -88,15 +82,9 @@ export const fetchMedicineById = async (id: number): Promise<Medicine> => {
       price,
       rank,
       disease_id,
-      disease:disease_id (
-        disease_id,
-        name
-      ),
+      disease:disease_id(disease_id,name),
       company_id,
-      company:company_id (
-        company_id,
-        name
-      )
+      company:company_id(company_id,name)
     `)
     .eq('medicine_id', id)
     .single();
@@ -187,15 +175,9 @@ export const fetchMedicinesByComposition = async (compositionId: number): Promis
         price,
         rank,
         disease_id,
-        disease:disease_id!disease_id_fk (
-          disease_id,
-          name
-        ),
+        disease:disease_id(disease_id,name),
         company_id,
-        company:company_id (
-          company_id,
-          name
-        )
+        company:company_id(company_id,name)
       )
     `)
     .eq('composition_id', compositionId);
@@ -239,15 +221,9 @@ export const fetchMedicinesByCompany = async (companyId: number): Promise<Medici
       price,
       rank,
       disease_id,
-      disease:disease_id!disease_id_fk (
-        disease_id,
-        name
-      ),
+      disease:disease_id(disease_id,name),
       company_id,
-      company:company_id (
-        company_id,
-        name
-      )
+      company:company_id(company_id,name)
     `)
     .eq('company_id', companyId);
 
