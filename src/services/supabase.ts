@@ -81,7 +81,7 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
   return data;
 };
 
-// Fetch all medicines - fixed query to avoid ambiguity with disease relationship
+// Fetch all medicines - fixed query to correctly specify the disease relationship
 export const fetchMedicines = async () => {
   const { data, error } = await supabase
     .from('medicines')
@@ -92,12 +92,12 @@ export const fetchMedicines = async () => {
       price,
       rank,
       disease_id,
-      disease:disease_id (
+      disease:disease(
         disease_id,
         name
       ),
       company_id,
-      company:company_id (
+      company:company_id(
         company_id,
         name
       )
@@ -122,12 +122,12 @@ export const fetchMedicineById = async (id: number) => {
       price,
       rank,
       disease_id,
-      disease:disease_id (
+      disease:disease(
         disease_id,
         name
       ),
       company_id,
-      company:company_id (
+      company:company_id(
         company_id,
         name
       )
@@ -140,7 +140,7 @@ export const fetchMedicineById = async (id: number) => {
     throw error;
   }
 
-  return data;
+  return data as Medicine;
 };
 
 // Fetch medicine compositions
@@ -230,7 +230,7 @@ export const fetchCompanies = async () => {
   return data;
 };
 
-// Fetch stock by pharmacy ID - fixed to use proper table name
+// Fetch stock by pharmacy ID
 export const fetchStockByPharmacy = async (pharmacyId: number) => {
   const { data, error } = await supabase
     .from('stock')
@@ -299,12 +299,12 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
         price,
         rank,
         disease_id,
-        disease:disease_id (
+        disease:disease(
           disease_id,
           name
         ),
         company_id,
-        company:company_id (
+        company:company_id(
           company_id,
           name
         )
@@ -329,12 +329,12 @@ export const fetchMedicinesByCompany = async (companyId: number) => {
       price,
       rank,
       disease_id,
-      disease:disease_id (
+      disease:disease(
         disease_id,
         name
       ),
       company_id,
-      company:company_id (
+      company:company_id(
         company_id,
         name
       )
@@ -379,3 +379,6 @@ export const fetchPharmacyById = async (pharmacyId: number) => {
   
   return data;
 };
+
+// Add missing type import
+import { Medicine } from '@/types/medicine';

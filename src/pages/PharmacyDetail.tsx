@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -32,7 +31,7 @@ const PharmacyDetail = () => {
   });
   
   // Fetch pharmacy stock data
-  const { data: stockItems, isLoading: isLoadingStock } = useQuery<StockItem[]>({
+  const { data: stockItemsData, isLoading: isLoadingStock } = useQuery({
     queryKey: ['pharmacyStock', pharmacyId],
     queryFn: () => fetchStockByPharmacy(pharmacyId),
     meta: {
@@ -46,6 +45,9 @@ const PharmacyDetail = () => {
       }
     }
   });
+  
+  // Cast stock data to the correct type
+  const stockItems = stockItemsData as unknown as StockItem[] | undefined;
   
   const isLoading = isLoadingPharmacy || isLoadingStock;
   

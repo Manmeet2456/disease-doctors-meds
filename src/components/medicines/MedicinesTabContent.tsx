@@ -61,7 +61,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         }
       } else if (compositionId && medicinesByComposition) {
         // If we have a composition filter from URL, use the fetched medicines
-        setFilteredMedicines(medicinesByComposition as Medicine[]);
+        setFilteredMedicines(medicinesByComposition as unknown as Medicine[]);
         
         if (medicinesByComposition.length === 0) {
           toast({
@@ -71,7 +71,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         }
       } else if (companyId && medicinesByCompany) {
         // If we have a company filter from URL, use the fetched medicines
-        setFilteredMedicines(medicinesByCompany as Medicine[]);
+        setFilteredMedicines(medicinesByCompany as unknown as Medicine[]);
         
         if (medicinesByCompany.length === 0) {
           toast({
@@ -113,7 +113,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         .then(compositionMedicines => {
           if (compositionMedicines) {
             // Apply remaining filters to these composition-specific medicines
-            let filteredResult = [...compositionMedicines] as Medicine[];
+            let filteredResult = [...compositionMedicines] as unknown as Medicine[];
             
             // Apply search term filter
             if (filters.searchTerm) {
@@ -226,7 +226,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
 
   const isCustomFiltering = compositionId || companyId || searchParams.get('disease');
 
-  // Clear Filters function (was missing)
+  // Clear Filters function
   const clearFilters = () => {
     // Reset URL params and navigate to medicines tab
     navigate('/medicines?tab=medicines');
