@@ -29,7 +29,7 @@ export const fetchDoctors = async (): Promise<Doctor[]> => {
 
 // Fetch doctors by disease ID
 export const fetchDoctorsByDisease = async (diseaseId: number): Promise<Doctor[]> => {
-  // Explicitly type the query result without deep type inference
+  // Use a simplified approach to avoid deep type inference
   const { data, error } = await supabase
     .from('doctors')
     .select('*')
@@ -40,7 +40,7 @@ export const fetchDoctorsByDisease = async (diseaseId: number): Promise<Doctor[]
     throw error;
   }
 
-  // Return the data as Doctor[] without relying on automatic type inference
+  // Explicitly cast the response to Doctor[] to avoid deep type inference
   return (data || []) as Doctor[];
 };
 
