@@ -114,19 +114,19 @@ export const fetchMedicineById = async (id: number): Promise<Medicine> => {
   // Safely add disease if it exists and has the required properties
   if (data.disease && 
       typeof data.disease === 'object' && 
-      data.disease !== null) {
-    // TypeScript requires this additional null check
-    if ('disease_id' in data.disease && 'name' in data.disease) {
-      medicine.disease = {
-        disease_id: data.disease.disease_id,
-        name: data.disease.name
-      };
-    }
+      data.disease !== null && 
+      'disease_id' in data.disease && 
+      'name' in data.disease) {
+    medicine.disease = {
+      disease_id: data.disease.disease_id,
+      name: data.disease.name
+    };
   }
   
   // Safely add company if it exists and has the required properties
   if (data.company && 
       typeof data.company === 'object' && 
+      data.company !== null && 
       'company_id' in data.company && 
       'name' in data.company) {
     medicine.company = {
@@ -241,19 +241,21 @@ export const fetchMedicinesByComposition = async (compositionId: number): Promis
       };
       
       // Safely add disease if it exists with required properties
-      if (medicine.disease && typeof medicine.disease === 'object' && medicine.disease !== null) {
-        // TypeScript requires this additional null check
-        if ('disease_id' in medicine.disease && 'name' in medicine.disease) {
-          result.disease = {
-            disease_id: medicine.disease.disease_id,
-            name: medicine.disease.name
-          };
-        }
+      if (medicine.disease && 
+          typeof medicine.disease === 'object' && 
+          medicine.disease !== null &&
+          'disease_id' in medicine.disease && 
+          'name' in medicine.disease) {
+        result.disease = {
+          disease_id: medicine.disease.disease_id,
+          name: medicine.disease.name
+        };
       }
       
       // Check if company exists and has the expected structure
       if (medicine.company && 
-          typeof medicine.company === 'object' && 
+          typeof medicine.company === 'object' &&
+          medicine.company !== null &&
           'company_id' in medicine.company && 
           'name' in medicine.company) {
         result.company = {
@@ -306,19 +308,21 @@ export const fetchMedicinesByCompany = async (companyId: number): Promise<Medici
     };
     
     // Safely add disease if it exists with required properties
-    if (medicine.disease && typeof medicine.disease === 'object' && medicine.disease !== null) {
-      // TypeScript requires this additional null check
-      if ('disease_id' in medicine.disease && 'name' in medicine.disease) {
-        result.disease = {
-          disease_id: medicine.disease.disease_id,
-          name: medicine.disease.name
-        };
-      }
+    if (medicine.disease && 
+        typeof medicine.disease === 'object' && 
+        medicine.disease !== null &&
+        'disease_id' in medicine.disease && 
+        'name' in medicine.disease) {
+      result.disease = {
+        disease_id: medicine.disease.disease_id,
+        name: medicine.disease.name
+      };
     }
     
     // Check if company exists and has the expected structure
     if (medicine.company && 
-        typeof medicine.company === 'object' && 
+        typeof medicine.company === 'object' &&
+        medicine.company !== null &&
         'company_id' in medicine.company && 
         'name' in medicine.company) {
       result.company = {

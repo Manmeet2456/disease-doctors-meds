@@ -1,8 +1,12 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
+
+// Define a type for the doctor data structure
+type Doctor = Tables<"doctors">;
 
 // Fetch all doctors
-export const fetchDoctors = async () => {
+export const fetchDoctors = async (): Promise<Doctor[]> => {
   const { data, error } = await supabase
     .from('doctors')
     .select('*');
@@ -16,7 +20,7 @@ export const fetchDoctors = async () => {
 };
 
 // Fetch doctors by disease ID
-export const fetchDoctorsByDisease = async (diseaseId: number) => {
+export const fetchDoctorsByDisease = async (diseaseId: number): Promise<Doctor[]> => {
   const { data, error } = await supabase
     .from('doctors')
     .select('*')
@@ -31,7 +35,7 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
 };
 
 // Fetch doctor specializations for filtering
-export const fetchDoctorSpecializations = async () => {
+export const fetchDoctorSpecializations = async (): Promise<string[]> => {
   const { data, error } = await supabase
     .from('doctors')
     .select('specialization')
