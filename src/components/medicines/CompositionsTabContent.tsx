@@ -39,7 +39,7 @@ const CompositionsTabContent = ({ compositions, onExport }: CompositionsTabConte
           {filteredCompositions.map((composition) => (
             <Link
               key={composition.composition_id}
-              to={`/medicines?composition=${composition.composition_id}`}
+              to={`/medicines?tab=medicines&composition=${composition.composition_id}`}
               className="p-4 border rounded-md hover:bg-primary-50 hover:border-primary transition-colors flex items-center justify-between"
             >
               <h4 className="font-medium">{composition.name}</h4>

@@ -1,9 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, X } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchDoctorSpecializations } from '@/services/supabase';
+import { toast } from '@/components/ui/use-toast';
 
 interface DoctorFiltersProps {
   onFilterChange: (filters: any) => void;
@@ -13,6 +16,29 @@ const DoctorFilters = ({ onFilterChange }: DoctorFiltersProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
   const [specialization, setSpecialization] = useState('all');
+  const filtersDivRef = React.useRef<HTMLDivElement>(null);
+  
+  // Fetch actual specializations from the database
+  const { data: specializations = [] } = useQuery({
+    queryKey: ['doctorSpecializations'],
+    queryFn: fetchDoctorSpecializations
+  });
+
+  // Add event listener for reset filters
+  useEffect(() => {
+    const handleResetFilters = () => {
+      resetFilters();
+    };
+    
+    const divElement = filtersDivRef.current;
+    if (divElement) {
+      divElement.addEventListener('resetFilters', handleResetFilters);
+      
+      return () => {
+        divElement.removeEventListener('resetFilters', handleResetFilters);
+      };
+    }
+  }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -33,11 +59,33 @@ const DoctorFilters = ({ onFilterChange }: DoctorFiltersProps) => {
       specialization
     });
   };
+  
+  const resetFilters = () => {
+    setSearchTerm('');
+    setSortBy('name-asc');
+    setSpecialization('all');
+    
+    onFilterChange({
+      searchTerm: '',
+      sortBy: 'name-asc',
+      specialization: 'all'
+    });
+    
+    toast({
+      title: "Filters Reset",
+      description: "All filters have been cleared.",
+    });
+  };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-      <h3 className="text-lg font-semibold mb-4 flex items-center">
-        <Filter className="h-5 w-5 mr-2" /> Filter Doctors
+    <div ref={filtersDivRef} data-doctor-filters className="bg-white p-6 rounded-lg shadow-md mb-8">
+      <h3 className="text-lg font-semibold mb-4 flex items-center justify-between">
+        <div className="flex items-center">
+          <Filter className="h-5 w-5 mr-2" /> Filter Doctors
+        </div>
+        <Button variant="ghost" size="sm" onClick={resetFilters} className="flex items-center gap-1">
+          <X className="h-4 w-4" /> Clear Filters
+        </Button>
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
@@ -58,11 +106,9 @@ const DoctorFilters = ({ onFilterChange }: DoctorFiltersProps) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Specializations</SelectItem>
-              <SelectItem value="cardiology">Cardiology</SelectItem>
-              <SelectItem value="neurology">Neurology</SelectItem>
-              <SelectItem value="pulmonology">Pulmonology</SelectItem>
-              <SelectItem value="endocrinology">Endocrinology</SelectItem>
-              <SelectItem value="gastroenterology">Gastroenterology</SelectItem>
+              {specializations.map((spec: string) => (
+                <SelectItem key={spec} value={spec.toLowerCase()}>{spec}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
