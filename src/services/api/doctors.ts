@@ -1,6 +1,5 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import type { Tables } from "@/integrations/supabase/types";
 
 // Define a more specific type for the doctor data structure
 export type Doctor = {
@@ -24,8 +23,7 @@ export const fetchDoctors = async (): Promise<Doctor[]> => {
     throw error;
   }
 
-  // Explicitly cast the return value to Doctor[]
-  return data as Doctor[];
+  return (data || []) as Doctor[];
 };
 
 // Fetch doctors by disease ID
@@ -40,8 +38,7 @@ export const fetchDoctorsByDisease = async (diseaseId: number): Promise<Doctor[]
     throw error;
   }
 
-  // Explicitly cast the return value to Doctor[]
-  return data as Doctor[];
+  return (data || []) as Doctor[];
 };
 
 // Fetch doctor specializations for filtering
