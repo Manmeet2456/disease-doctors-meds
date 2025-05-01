@@ -43,7 +43,7 @@ export const fetchMedicines = async (): Promise<Medicine[]> => {
       price,
       rank,
       disease_id,
-      disease:disease_id (
+      disease:disease_id!disease_id_fk (
         disease_id,
         name
       ),
@@ -187,7 +187,7 @@ export const fetchMedicinesByComposition = async (compositionId: number): Promis
         price,
         rank,
         disease_id,
-        disease:disease_id (
+        disease:disease_id!disease_id_fk (
           disease_id,
           name
         ),
@@ -239,7 +239,7 @@ export const fetchMedicinesByCompany = async (companyId: number): Promise<Medici
       price,
       rank,
       disease_id,
-      disease:disease_id (
+      disease:disease_id!disease_id_fk (
         disease_id,
         name
       ),
