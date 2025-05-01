@@ -29,7 +29,7 @@ export const fetchDoctors = async (): Promise<Doctor[]> => {
 
 // Fetch doctors by disease ID
 export const fetchDoctorsByDisease = async (diseaseId: number): Promise<Doctor[]> => {
-  // Use explicit typing for the query result
+  // Explicitly type the query result without deep type inference
   const { data, error } = await supabase
     .from('doctors')
     .select('*')
