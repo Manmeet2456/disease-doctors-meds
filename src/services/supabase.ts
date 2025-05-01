@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Medicine, Composition, Company } from '@/types/medicine';
 
@@ -117,9 +116,19 @@ export const fetchMedicines = async (): Promise<Medicine[]> => {
     price: item.price,
     rank: item.rank,
     disease_id: item.disease_id,
-    disease: item.disease || null,
+    disease: item.disease && typeof item.disease !== 'string' 
+      ? { 
+          disease_id: item.disease.disease_id,
+          name: item.disease.name 
+        } 
+      : null,
     company_id: item.company_id,
-    company: item.company || null
+    company: item.company && typeof item.company !== 'string'
+      ? { 
+          company_id: item.company.company_id,
+          name: item.company.name 
+        }
+      : null
   })) as Medicine[];
 };
 
@@ -160,9 +169,19 @@ export const fetchMedicineById = async (id: number): Promise<Medicine> => {
     price: data.price,
     rank: data.rank,
     disease_id: data.disease_id,
-    disease: data.disease || null,
+    disease: data.disease && typeof data.disease !== 'string' 
+      ? { 
+          disease_id: data.disease.disease_id,
+          name: data.disease.name 
+        } 
+      : null,
     company_id: data.company_id,
-    company: data.company || null
+    company: data.company && typeof data.company !== 'string'
+      ? { 
+          company_id: data.company.company_id,
+          name: data.company.name 
+        }
+      : null
   };
 
   return medicine;
@@ -209,7 +228,7 @@ export const fetchPharmaciesByMedicine = async (medicineId: number) => {
     .from('stock')
     .select(`
       pharmacy_id,
-      pharmacies:pharmacy_id (
+      pharmacy:pharmacy_id (
         pharmacy_id,
         name,
         location,
@@ -224,7 +243,7 @@ export const fetchPharmaciesByMedicine = async (medicineId: number) => {
   }
 
   // Transform the data to match the expected format
-  return data.map(item => item.pharmacies);
+  return data.map(item => item.pharmacy);
 };
 
 // Fetch all compositions
@@ -264,7 +283,7 @@ export const fetchStockByPharmacy = async (pharmacyId: number) => {
       medicine_id,
       quantity,
       price_store,
-      medicines:medicine_id (
+      medicine:medicine_id (
         medicine_id,
         name,
         type
@@ -277,7 +296,13 @@ export const fetchStockByPharmacy = async (pharmacyId: number) => {
     throw error;
   }
   
-  return data;
+  return data.map(item => ({
+    stock_id: item.stock_id,
+    medicine_id: item.medicine_id,
+    quantity: item.quantity,
+    price_store: item.price_store,
+    medicines: item.medicine
+  }));
 };
 
 // Fetch medicineTypes for filtering
@@ -317,7 +342,7 @@ export const fetchMedicinesByComposition = async (compositionId: number): Promis
     .from('medicine_compositions')
     .select(`
       medicine_id,
-      medicines:medicine_id (
+      medicine:medicine_id (
         medicine_id,
         name,
         type,
@@ -341,13 +366,29 @@ export const fetchMedicinesByComposition = async (compositionId: number): Promis
   
   // Transform the data to match the expected Medicine format
   return data.map(item => {
-    const medicine = item.medicines;
+    const medicine = item.medicine;
     return {
-      ...medicine,
-      disease: medicine.disease || null,
-      company: medicine.company || null
-    };
-  }) as Medicine[];
+      medicine_id: medicine.medicine_id,
+      name: medicine.name,
+      type: medicine.type,
+      price: medicine.price,
+      rank: medicine.rank,
+      disease_id: medicine.disease_id,
+      disease: medicine.disease && typeof medicine.disease !== 'string'
+        ? { 
+            disease_id: medicine.disease.disease_id,
+            name: medicine.disease.name 
+          }
+        : null,
+      company_id: medicine.company_id,
+      company: medicine.company && typeof medicine.company !== 'string'
+        ? { 
+            company_id: medicine.company.company_id,
+            name: medicine.company.name 
+          }
+        : null
+    } as Medicine;
+  });
 };
 
 // Fetch medicines by company with fixed relationship selection
@@ -377,9 +418,25 @@ export const fetchMedicinesByCompany = async (companyId: number): Promise<Medici
   
   // Transform to ensure data conforms to Medicine type
   return data.map(medicine => ({
-    ...medicine,
-    disease: medicine.disease || null,
-    company: medicine.company || null
+    medicine_id: medicine.medicine_id,
+    name: medicine.name,
+    type: medicine.type,
+    price: medicine.price,
+    rank: medicine.rank,
+    disease_id: medicine.disease_id,
+    disease: medicine.disease && typeof medicine.disease !== 'string'
+      ? { 
+          disease_id: medicine.disease.disease_id,
+          name: medicine.disease.name 
+        } 
+      : null,
+    company_id: medicine.company_id,
+    company: medicine.company && typeof medicine.company !== 'string'
+      ? { 
+          company_id: medicine.company.company_id,
+          name: medicine.company.name 
+        }
+      : null
   })) as Medicine[];
 };
 
