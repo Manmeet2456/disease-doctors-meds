@@ -1,8 +1,10 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { PillIcon, Star, Tag, Building } from 'lucide-react';
-import MedicineCardActions from './MedicineCardActions';
+import { Link, useNavigate } from 'react-router-dom';
+import { Medicine } from '@/types/medicine';
 
 interface MedicineCardProps {
   medicine: {
@@ -18,6 +20,16 @@ interface MedicineCardProps {
 }
 
 const MedicineCard = ({ medicine }: MedicineCardProps) => {
+  const navigate = useNavigate();
+  
+  const handleViewDetails = () => {
+    navigate(`/medicines/${medicine.id}`);
+  };
+  
+  const handleCheckAvailability = () => {
+    navigate(`/pharmacies?medicine=${medicine.id}`);
+  };
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
       <div className="w-full h-40 bg-gray-100 overflow-hidden">
@@ -55,8 +67,9 @@ const MedicineCard = ({ medicine }: MedicineCardProps) => {
           </div>
         </div>
       </CardContent>
-      <CardFooter>
-        <MedicineCardActions medicineId={medicine.id} />
+      <CardFooter className="flex flex-col space-y-2">
+        <Button variant="outline" className="w-full" onClick={handleViewDetails}>View Details</Button>
+        <Button className="w-full" onClick={handleCheckAvailability}>Check Availability</Button>
       </CardFooter>
     </Card>
   );
