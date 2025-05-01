@@ -24,7 +24,7 @@ export const fetchDoctors = async (): Promise<Doctor[]> => {
     throw error;
   }
 
-  return data;
+  return data as Doctor[];
 };
 
 // Fetch doctors by disease ID
@@ -39,7 +39,7 @@ export const fetchDoctorsByDisease = async (diseaseId: number): Promise<Doctor[]
     throw error;
   }
 
-  return data;
+  return data as Doctor[];
 };
 
 // Fetch doctor specializations for filtering
