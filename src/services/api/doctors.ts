@@ -2,8 +2,16 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
-// Define a type for the doctor data structure
-type Doctor = Tables<"doctors">;
+// Define a more specific type for the doctor data structure
+export type Doctor = {
+  doctor_id: number;
+  name: string;
+  specialization: string | null;
+  hospital: string | null;
+  contact_info: string | null;
+  experience_years: number | null;
+  disease_id?: number | null;
+};
 
 // Fetch all doctors
 export const fetchDoctors = async (): Promise<Doctor[]> => {

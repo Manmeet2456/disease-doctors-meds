@@ -2,6 +2,36 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Medicine } from '@/types/medicine';
 
+// Helper function to safely process disease data
+const processDisease = (disease: any) => {
+  if (disease && 
+      typeof disease === 'object' && 
+      disease !== null &&
+      'disease_id' in disease && 
+      'name' in disease) {
+    return {
+      disease_id: disease.disease_id,
+      name: disease.name
+    };
+  }
+  return null;
+};
+
+// Helper function to safely process company data
+const processCompany = (company: any) => {
+  if (company && 
+      typeof company === 'object' &&
+      company !== null &&
+      'company_id' in company && 
+      'name' in company) {
+    return {
+      company_id: company.company_id,
+      name: company.name
+    };
+  }
+  return null;
+};
+
 // Fetch all medicines with proper relationship handling and type safety
 export const fetchMedicines = async (): Promise<Medicine[]> => {
   const { data, error } = await supabase
@@ -38,32 +68,10 @@ export const fetchMedicines = async (): Promise<Medicine[]> => {
       price: item.price,
       rank: item.rank,
       disease_id: item.disease_id,
-      disease: null,
+      disease: processDisease(item.disease),
       company_id: item.company_id,
-      company: null
+      company: processCompany(item.company)
     };
-    
-    // Check if disease exists and has the expected structure
-    if (item.disease && 
-        typeof item.disease === 'object' && 
-        'disease_id' in item.disease && 
-        'name' in item.disease) {
-      medicineObj.disease = {
-        disease_id: item.disease.disease_id,
-        name: item.disease.name
-      };
-    }
-    
-    // Check if company exists and has the expected structure
-    if (item.company && 
-        typeof item.company === 'object' && 
-        'company_id' in item.company && 
-        'name' in item.company) {
-      medicineObj.company = {
-        company_id: item.company.company_id,
-        name: item.company.name
-      };
-    }
     
     return medicineObj;
   });
@@ -98,7 +106,7 @@ export const fetchMedicineById = async (id: number): Promise<Medicine> => {
     throw error;
   }
 
-  // Create medicine object with null values for nested properties
+  // Create medicine object with processed nested properties
   const medicine: Medicine = {
     medicine_id: data.medicine_id,
     name: data.name,
@@ -106,35 +114,11 @@ export const fetchMedicineById = async (id: number): Promise<Medicine> => {
     price: data.price,
     rank: data.rank,
     disease_id: data.disease_id,
-    disease: null,
+    disease: processDisease(data.disease),
     company_id: data.company_id,
-    company: null
+    company: processCompany(data.company)
   };
   
-  // Safely add disease if it exists and has the required properties
-  if (data.disease && 
-      typeof data.disease === 'object' && 
-      data.disease !== null && 
-      'disease_id' in data.disease && 
-      'name' in data.disease) {
-    medicine.disease = {
-      disease_id: data.disease.disease_id,
-      name: data.disease.name
-    };
-  }
-  
-  // Safely add company if it exists and has the required properties
-  if (data.company && 
-      typeof data.company === 'object' && 
-      data.company !== null && 
-      'company_id' in data.company && 
-      'name' in data.company) {
-    medicine.company = {
-      company_id: data.company.company_id,
-      name: data.company.name
-    };
-  }
-
   return medicine;
 };
 
@@ -235,34 +219,10 @@ export const fetchMedicinesByComposition = async (compositionId: number): Promis
         price: medicine.price,
         rank: medicine.rank,
         disease_id: medicine.disease_id,
-        disease: null,
+        disease: processDisease(medicine.disease),
         company_id: medicine.company_id,
-        company: null
+        company: processCompany(medicine.company)
       };
-      
-      // Safely add disease if it exists with required properties
-      if (medicine.disease && 
-          typeof medicine.disease === 'object' && 
-          medicine.disease !== null &&
-          'disease_id' in medicine.disease && 
-          'name' in medicine.disease) {
-        result.disease = {
-          disease_id: medicine.disease.disease_id,
-          name: medicine.disease.name
-        };
-      }
-      
-      // Check if company exists and has the expected structure
-      if (medicine.company && 
-          typeof medicine.company === 'object' &&
-          medicine.company !== null &&
-          'company_id' in medicine.company && 
-          'name' in medicine.company) {
-        result.company = {
-          company_id: medicine.company.company_id,
-          name: medicine.company.name
-        };
-      }
       
       return result;
     });
@@ -302,34 +262,10 @@ export const fetchMedicinesByCompany = async (companyId: number): Promise<Medici
       price: medicine.price,
       rank: medicine.rank,
       disease_id: medicine.disease_id,
-      disease: null,
+      disease: processDisease(medicine.disease),
       company_id: medicine.company_id,
-      company: null
+      company: processCompany(medicine.company)
     };
-    
-    // Safely add disease if it exists with required properties
-    if (medicine.disease && 
-        typeof medicine.disease === 'object' && 
-        medicine.disease !== null &&
-        'disease_id' in medicine.disease && 
-        'name' in medicine.disease) {
-      result.disease = {
-        disease_id: medicine.disease.disease_id,
-        name: medicine.disease.name
-      };
-    }
-    
-    // Check if company exists and has the expected structure
-    if (medicine.company && 
-        typeof medicine.company === 'object' &&
-        medicine.company !== null &&
-        'company_id' in medicine.company && 
-        'name' in medicine.company) {
-      result.company = {
-        company_id: medicine.company.company_id,
-        name: medicine.company.name
-      };
-    }
     
     return result;
   });
