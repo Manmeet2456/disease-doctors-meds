@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { Medicine, Composition, Company } from '@/types/medicine';
 
 // Fetch all diseases
 export const fetchDiseases = async () => {
@@ -81,8 +82,8 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
   return data;
 };
 
-// Fetch all medicines - fixed query to correctly specify the disease relationship
-export const fetchMedicines = async () => {
+// Fetch all medicines - fixing the query to correctly specify relationships
+export const fetchMedicines = async (): Promise<Medicine[]> => {
   const { data, error } = await supabase
     .from('medicines')
     .select(`
@@ -92,12 +93,12 @@ export const fetchMedicines = async () => {
       price,
       rank,
       disease_id,
-      disease:disease(
+      disease:disease_id (
         disease_id,
         name
       ),
       company_id,
-      company:company_id(
+      company:company_id (
         company_id,
         name
       )
@@ -108,11 +109,22 @@ export const fetchMedicines = async () => {
     throw error;
   }
 
-  return data;
+  // Transform the data to ensure it conforms to the Medicine type
+  return data.map(item => ({
+    medicine_id: item.medicine_id,
+    name: item.name,
+    type: item.type,
+    price: item.price,
+    rank: item.rank,
+    disease_id: item.disease_id,
+    disease: item.disease || null,
+    company_id: item.company_id,
+    company: item.company || null
+  })) as Medicine[];
 };
 
 // Fetch a single medicine by ID
-export const fetchMedicineById = async (id: number) => {
+export const fetchMedicineById = async (id: number): Promise<Medicine> => {
   const { data, error } = await supabase
     .from('medicines')
     .select(`
@@ -122,12 +134,12 @@ export const fetchMedicineById = async (id: number) => {
       price,
       rank,
       disease_id,
-      disease:disease(
+      disease:disease_id (
         disease_id,
         name
       ),
       company_id,
-      company:company_id(
+      company:company_id (
         company_id,
         name
       )
@@ -140,7 +152,20 @@ export const fetchMedicineById = async (id: number) => {
     throw error;
   }
 
-  return data as Medicine;
+  // Ensure the returned data conforms to the Medicine type
+  const medicine: Medicine = {
+    medicine_id: data.medicine_id,
+    name: data.name,
+    type: data.type,
+    price: data.price,
+    rank: data.rank,
+    disease_id: data.disease_id,
+    disease: data.disease || null,
+    company_id: data.company_id,
+    company: data.company || null
+  };
+
+  return medicine;
 };
 
 // Fetch medicine compositions
@@ -178,13 +203,13 @@ export const fetchPharmacies = async () => {
   return data;
 };
 
-// Fetch pharmacies by medicine ID
+// Fetch pharmacies by medicine ID - fixing the query structure
 export const fetchPharmaciesByMedicine = async (medicineId: number) => {
   const { data, error } = await supabase
-    .from('pharmacy_stock')
+    .from('stock')
     .select(`
       pharmacy_id,
-      pharmacies (
+      pharmacies:pharmacy_id (
         pharmacy_id,
         name,
         location,
@@ -198,7 +223,7 @@ export const fetchPharmaciesByMedicine = async (medicineId: number) => {
     throw error;
   }
 
-  // Transform the data to match the expected Pharmacy format
+  // Transform the data to match the expected format
   return data.map(item => item.pharmacies);
 };
 
@@ -239,7 +264,7 @@ export const fetchStockByPharmacy = async (pharmacyId: number) => {
       medicine_id,
       quantity,
       price_store,
-      medicines (
+      medicines:medicine_id (
         medicine_id,
         name,
         type
@@ -286,25 +311,25 @@ export const fetchMaxMedicinePrice = async () => {
   return data[0]?.price || 100;
 };
 
-// Fetch medicines by composition with correct disease selection
-export const fetchMedicinesByComposition = async (compositionId: number) => {
+// Fetch medicines by composition with fixed relationship selection
+export const fetchMedicinesByComposition = async (compositionId: number): Promise<Medicine[]> => {
   const { data, error } = await supabase
     .from('medicine_compositions')
     .select(`
       medicine_id,
-      medicines (
+      medicines:medicine_id (
         medicine_id,
         name,
         type,
         price,
         rank,
         disease_id,
-        disease:disease(
+        disease:disease_id (
           disease_id,
           name
         ),
         company_id,
-        company:company_id(
+        company:company_id (
           company_id,
           name
         )
@@ -315,11 +340,18 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   if (error) throw error;
   
   // Transform the data to match the expected Medicine format
-  return data.map(item => item.medicines);
+  return data.map(item => {
+    const medicine = item.medicines;
+    return {
+      ...medicine,
+      disease: medicine.disease || null,
+      company: medicine.company || null
+    };
+  }) as Medicine[];
 };
 
-// Fetch medicines by company with correct disease selection
-export const fetchMedicinesByCompany = async (companyId: number) => {
+// Fetch medicines by company with fixed relationship selection
+export const fetchMedicinesByCompany = async (companyId: number): Promise<Medicine[]> => {
   const { data, error } = await supabase
     .from('medicines')
     .select(`
@@ -329,12 +361,12 @@ export const fetchMedicinesByCompany = async (companyId: number) => {
       price,
       rank,
       disease_id,
-      disease:disease(
+      disease:disease_id (
         disease_id,
         name
       ),
       company_id,
-      company:company_id(
+      company:company_id (
         company_id,
         name
       )
@@ -343,7 +375,12 @@ export const fetchMedicinesByCompany = async (companyId: number) => {
 
   if (error) throw error;
   
-  return data;
+  // Transform to ensure data conforms to Medicine type
+  return data.map(medicine => ({
+    ...medicine,
+    disease: medicine.disease || null,
+    company: medicine.company || null
+  })) as Medicine[];
 };
 
 // Fetch doctor specializations for filtering
@@ -379,6 +416,3 @@ export const fetchPharmacyById = async (pharmacyId: number) => {
   
   return data;
 };
-
-// Add missing type import
-import { Medicine } from '@/types/medicine';
