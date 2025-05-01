@@ -109,27 +109,37 @@ export const fetchMedicines = async (): Promise<Medicine[]> => {
   }
 
   // Transform the data to ensure it conforms to the Medicine type
-  return data.map(item => ({
-    medicine_id: item.medicine_id,
-    name: item.name,
-    type: item.type,
-    price: item.price,
-    rank: item.rank,
-    disease_id: item.disease_id,
-    disease: item.disease && typeof item.disease !== 'string' 
-      ? { 
-          disease_id: item.disease.disease_id,
-          name: item.disease.name 
-        } 
-      : null,
-    company_id: item.company_id,
-    company: item.company && typeof item.company !== 'string'
-      ? { 
-          company_id: item.company.company_id,
-          name: item.company.name 
-        }
-      : null
-  })) as Medicine[];
+  return data.map(item => {
+    const medicineObj: Medicine = {
+      medicine_id: item.medicine_id,
+      name: item.name,
+      type: item.type,
+      price: item.price,
+      rank: item.rank,
+      disease_id: item.disease_id,
+      disease: null,
+      company_id: item.company_id,
+      company: null
+    };
+    
+    // Check if disease exists and has the expected structure
+    if (item.disease && typeof item.disease === 'object' && 'disease_id' in item.disease && 'name' in item.disease) {
+      medicineObj.disease = {
+        disease_id: item.disease.disease_id,
+        name: item.disease.name
+      };
+    }
+    
+    // Check if company exists and has the expected structure
+    if (item.company && typeof item.company === 'object' && 'company_id' in item.company && 'name' in item.company) {
+      medicineObj.company = {
+        company_id: item.company.company_id,
+        name: item.company.name
+      };
+    }
+    
+    return medicineObj;
+  });
 };
 
 // Fetch a single medicine by ID
@@ -169,20 +179,26 @@ export const fetchMedicineById = async (id: number): Promise<Medicine> => {
     price: data.price,
     rank: data.rank,
     disease_id: data.disease_id,
-    disease: data.disease && typeof data.disease !== 'string' 
-      ? { 
-          disease_id: data.disease.disease_id,
-          name: data.disease.name 
-        } 
-      : null,
+    disease: null,
     company_id: data.company_id,
-    company: data.company && typeof data.company !== 'string'
-      ? { 
-          company_id: data.company.company_id,
-          name: data.company.name 
-        }
-      : null
+    company: null
   };
+  
+  // Check if disease exists and has the expected structure
+  if (data.disease && typeof data.disease === 'object' && 'disease_id' in data.disease && 'name' in data.disease) {
+    medicine.disease = {
+      disease_id: data.disease.disease_id,
+      name: data.disease.name
+    };
+  }
+  
+  // Check if company exists and has the expected structure
+  if (data.company && typeof data.company === 'object' && 'company_id' in data.company && 'name' in data.company) {
+    medicine.company = {
+      company_id: data.company.company_id,
+      name: data.company.name
+    };
+  }
 
   return medicine;
 };
@@ -243,7 +259,7 @@ export const fetchPharmaciesByMedicine = async (medicineId: number) => {
   }
 
   // Transform the data to match the expected format
-  return data.map(item => item.pharmacy);
+  return data.map(item => item.pharmacy).filter(Boolean);
 };
 
 // Fetch all compositions
@@ -366,29 +382,39 @@ export const fetchMedicinesByComposition = async (compositionId: number): Promis
   
   // Transform the data to match the expected Medicine format
   return data.map(item => {
+    if (!item.medicine) return null;
+    
     const medicine = item.medicine;
-    return {
+    const result: Medicine = {
       medicine_id: medicine.medicine_id,
       name: medicine.name,
       type: medicine.type,
       price: medicine.price,
       rank: medicine.rank,
       disease_id: medicine.disease_id,
-      disease: medicine.disease && typeof medicine.disease !== 'string'
-        ? { 
-            disease_id: medicine.disease.disease_id,
-            name: medicine.disease.name 
-          }
-        : null,
+      disease: null,
       company_id: medicine.company_id,
-      company: medicine.company && typeof medicine.company !== 'string'
-        ? { 
-            company_id: medicine.company.company_id,
-            name: medicine.company.name 
-          }
-        : null
-    } as Medicine;
-  });
+      company: null
+    };
+    
+    // Check if disease exists and has the expected structure
+    if (medicine.disease && typeof medicine.disease === 'object' && 'disease_id' in medicine.disease && 'name' in medicine.disease) {
+      result.disease = {
+        disease_id: medicine.disease.disease_id,
+        name: medicine.disease.name
+      };
+    }
+    
+    // Check if company exists and has the expected structure
+    if (medicine.company && typeof medicine.company === 'object' && 'company_id' in medicine.company && 'name' in medicine.company) {
+      result.company = {
+        company_id: medicine.company.company_id,
+        name: medicine.company.name
+      };
+    }
+    
+    return result;
+  }).filter((item): item is Medicine => item !== null);
 };
 
 // Fetch medicines by company with fixed relationship selection
@@ -417,27 +443,37 @@ export const fetchMedicinesByCompany = async (companyId: number): Promise<Medici
   if (error) throw error;
   
   // Transform to ensure data conforms to Medicine type
-  return data.map(medicine => ({
-    medicine_id: medicine.medicine_id,
-    name: medicine.name,
-    type: medicine.type,
-    price: medicine.price,
-    rank: medicine.rank,
-    disease_id: medicine.disease_id,
-    disease: medicine.disease && typeof medicine.disease !== 'string'
-      ? { 
-          disease_id: medicine.disease.disease_id,
-          name: medicine.disease.name 
-        } 
-      : null,
-    company_id: medicine.company_id,
-    company: medicine.company && typeof medicine.company !== 'string'
-      ? { 
-          company_id: medicine.company.company_id,
-          name: medicine.company.name 
-        }
-      : null
-  })) as Medicine[];
+  return data.map(medicine => {
+    const result: Medicine = {
+      medicine_id: medicine.medicine_id,
+      name: medicine.name,
+      type: medicine.type,
+      price: medicine.price,
+      rank: medicine.rank,
+      disease_id: medicine.disease_id,
+      disease: null,
+      company_id: medicine.company_id,
+      company: null
+    };
+    
+    // Check if disease exists and has the expected structure
+    if (medicine.disease && typeof medicine.disease === 'object' && 'disease_id' in medicine.disease && 'name' in medicine.disease) {
+      result.disease = {
+        disease_id: medicine.disease.disease_id,
+        name: medicine.disease.name
+      };
+    }
+    
+    // Check if company exists and has the expected structure
+    if (medicine.company && typeof medicine.company === 'object' && 'company_id' in medicine.company && 'name' in medicine.company) {
+      result.company = {
+        company_id: medicine.company.company_id,
+        name: medicine.company.name
+      };
+    }
+    
+    return result;
+  });
 };
 
 // Fetch doctor specializations for filtering
