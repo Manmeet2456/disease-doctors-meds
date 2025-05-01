@@ -23,6 +23,7 @@ export const fetchDoctors = async (): Promise<Doctor[]> => {
     throw error;
   }
 
+  // Use explicit type assertion to avoid deep type inference
   return (data || []) as Doctor[];
 };
 
@@ -38,6 +39,7 @@ export const fetchDoctorsByDisease = async (diseaseId: number): Promise<Doctor[]
     throw error;
   }
 
+  // Use explicit type assertion to avoid deep type inference
   return (data || []) as Doctor[];
 };
 
