@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -8,27 +9,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Building, Info, PillIcon, Tag, Star } from 'lucide-react';
 import { fetchMedicineById, fetchMedicineCompositions } from '@/services/supabase';
-import { Medicine } from '@/types/medicine';
-
-interface MedicineComposition {
-  composition_id: number;
-  compositions?: {
-    composition_id: number;
-    name: string;
-  };
-}
 
 const MedicineDetail = () => {
   const { id } = useParams();
   const medicineId = parseInt(id || '0');
   
-  const { data: medicine, isLoading: isMedicineLoading } = useQuery<Medicine>({
+  const { data: medicine, isLoading: isMedicineLoading } = useQuery({
     queryKey: ['medicine', medicineId],
     queryFn: () => fetchMedicineById(medicineId),
     enabled: !!medicineId
   });
   
-  const { data: compositions, isLoading: isCompositionsLoading } = useQuery<MedicineComposition[]>({
+  const { data: compositions, isLoading: isCompositionsLoading } = useQuery({
     queryKey: ['medicineCompositions', medicineId],
     queryFn: () => fetchMedicineCompositions(medicineId),
     enabled: !!medicineId

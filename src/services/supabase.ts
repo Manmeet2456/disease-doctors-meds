@@ -1,11 +1,9 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { Medicine, Composition, Company } from '@/types/medicine';
 
 // Fetch all diseases
 export const fetchDiseases = async () => {
   const { data, error } = await supabase
-    .from('disease')
+    .from('diseases')
     .select('*');
 
   if (error) {
@@ -16,31 +14,10 @@ export const fetchDiseases = async () => {
   return data;
 };
 
-// Fetch disease categories
-export const fetchDiseaseCategories = async () => {
-  const { data, error } = await supabase
-    .from('disease')
-    .select('category')
-    .not('category', 'is', null);
-
-  if (error) {
-    console.error("Error fetching disease categories:", error);
-    throw error;
-  }
-
-  // Extract unique categories
-  const uniqueCategories = new Set<string>();
-  data.forEach(disease => {
-    if (disease.category) uniqueCategories.add(disease.category);
-  });
-
-  return Array.from(uniqueCategories);
-};
-
 // Fetch a single disease by ID
 export const fetchDiseaseById = async (id: number) => {
   const { data, error } = await supabase
-    .from('disease')
+    .from('diseases')
     .select('*')
     .eq('disease_id', id)
     .single();
@@ -82,8 +59,8 @@ export const fetchDoctorsByDisease = async (diseaseId: number) => {
   return data;
 };
 
-// Fetch all medicines - fixing the query to correctly specify relationships
-export const fetchMedicines = async (): Promise<Medicine[]> => {
+// Fetch all medicines
+export const fetchMedicines = async () => {
   const { data, error } = await supabase
     .from('medicines')
     .select(`
@@ -94,12 +71,10 @@ export const fetchMedicines = async (): Promise<Medicine[]> => {
       rank,
       disease_id,
       disease:disease_id (
-        disease_id,
         name
       ),
       company_id,
       company:company_id (
-        company_id,
         name
       )
     `);
@@ -109,48 +84,11 @@ export const fetchMedicines = async (): Promise<Medicine[]> => {
     throw error;
   }
 
-  // Transform the data to ensure it conforms to the Medicine type
-  return data.map(item => {
-    const medicineObj: Medicine = {
-      medicine_id: item.medicine_id,
-      name: item.name,
-      type: item.type,
-      price: item.price,
-      rank: item.rank,
-      disease_id: item.disease_id,
-      disease: null,
-      company_id: item.company_id,
-      company: null
-    };
-    
-    // Check if disease exists and has the expected structure
-    if (item.disease && 
-        typeof item.disease === 'object' && 
-        'disease_id' in item.disease && 
-        'name' in item.disease) {
-      medicineObj.disease = {
-        disease_id: item.disease.disease_id,
-        name: item.disease.name
-      };
-    }
-    
-    // Check if company exists and has the expected structure
-    if (item.company && 
-        typeof item.company === 'object' && 
-        'company_id' in item.company && 
-        'name' in item.company) {
-      medicineObj.company = {
-        company_id: item.company.company_id,
-        name: item.company.name
-      };
-    }
-    
-    return medicineObj;
-  });
+  return data;
 };
 
 // Fetch a single medicine by ID
-export const fetchMedicineById = async (id: number): Promise<Medicine> => {
+export const fetchMedicineById = async (id: number) => {
   const { data, error } = await supabase
     .from('medicines')
     .select(`
@@ -161,12 +99,10 @@ export const fetchMedicineById = async (id: number): Promise<Medicine> => {
       rank,
       disease_id,
       disease:disease_id (
-        disease_id,
         name
       ),
       company_id,
       company:company_id (
-        company_id,
         name
       )
     `)
@@ -178,42 +114,7 @@ export const fetchMedicineById = async (id: number): Promise<Medicine> => {
     throw error;
   }
 
-  // Ensure the returned data conforms to the Medicine type
-  const medicine: Medicine = {
-    medicine_id: data.medicine_id,
-    name: data.name,
-    type: data.type,
-    price: data.price,
-    rank: data.rank,
-    disease_id: data.disease_id,
-    disease: null,
-    company_id: data.company_id,
-    company: null
-  };
-  
-  // Check if disease exists and has the expected structure
-  if (data.disease && 
-      typeof data.disease === 'object' && 
-      'disease_id' in data.disease && 
-      'name' in data.disease) {
-    medicine.disease = {
-      disease_id: data.disease.disease_id,
-      name: data.disease.name
-    };
-  }
-  
-  // Check if company exists and has the expected structure
-  if (data.company && 
-      typeof data.company === 'object' && 
-      'company_id' in data.company && 
-      'name' in data.company) {
-    medicine.company = {
-      company_id: data.company.company_id,
-      name: data.company.name
-    };
-  }
-
-  return medicine;
+  return data;
 };
 
 // Fetch medicine compositions
@@ -251,13 +152,13 @@ export const fetchPharmacies = async () => {
   return data;
 };
 
-// Fetch pharmacies by medicine ID - fixing the query structure
+// Fetch pharmacies by medicine ID
 export const fetchPharmaciesByMedicine = async (medicineId: number) => {
   const { data, error } = await supabase
-    .from('stock')
+    .from('pharmacy_stock')
     .select(`
       pharmacy_id,
-      pharmacy:pharmacy_id (
+      pharmacies (
         pharmacy_id,
         name,
         location,
@@ -271,10 +172,8 @@ export const fetchPharmaciesByMedicine = async (medicineId: number) => {
     throw error;
   }
 
-  // Transform the data to match the expected format
-  return data
-    .map(item => item.pharmacy)
-    .filter(Boolean);
+  // Transform the data to match the expected Pharmacy format
+  return data.map(item => item.pharmacies);
 };
 
 // Fetch all compositions
@@ -308,13 +207,13 @@ export const fetchCompanies = async () => {
 // Fetch stock by pharmacy ID
 export const fetchStockByPharmacy = async (pharmacyId: number) => {
   const { data, error } = await supabase
-    .from('stock')
+    .from('pharmacy_stock')
     .select(`
       stock_id,
       medicine_id,
       quantity,
       price_store,
-      medicine:medicine_id (
+      medicines (
         medicine_id,
         name,
         type
@@ -327,13 +226,7 @@ export const fetchStockByPharmacy = async (pharmacyId: number) => {
     throw error;
   }
   
-  return data.map(item => ({
-    stock_id: item.stock_id,
-    medicine_id: item.medicine_id,
-    quantity: item.quantity,
-    price_store: item.price_store,
-    medicines: item.medicine
-  }));
+  return data;
 };
 
 // Fetch medicineTypes for filtering
@@ -367,13 +260,13 @@ export const fetchMaxMedicinePrice = async () => {
   return data[0]?.price || 100;
 };
 
-// Fetch medicines by composition with fixed relationship selection
-export const fetchMedicinesByComposition = async (compositionId: number): Promise<Medicine[]> => {
+// Fetch medicines by composition
+export const fetchMedicinesByComposition = async (compositionId: number) => {
   const { data, error } = await supabase
     .from('medicine_compositions')
     .select(`
       medicine_id,
-      medicine:medicine_id (
+      medicines (
         medicine_id,
         name,
         type,
@@ -381,12 +274,10 @@ export const fetchMedicinesByComposition = async (compositionId: number): Promis
         rank,
         disease_id,
         disease:disease_id (
-          disease_id,
           name
         ),
         company_id,
         company:company_id (
-          company_id,
           name
         )
       )
@@ -396,56 +287,11 @@ export const fetchMedicinesByComposition = async (compositionId: number): Promis
   if (error) throw error;
   
   // Transform the data to match the expected Medicine format
-  return data
-    .filter(item => item.medicine !== null)
-    .map(item => {
-      if (!item.medicine) {
-        // This should never happen due to the filter above, but TypeScript needs this check
-        throw new Error("Unexpected null medicine after filter");
-      }
-      
-      const medicine = item.medicine;
-      const result: Medicine = {
-        medicine_id: medicine.medicine_id,
-        name: medicine.name,
-        type: medicine.type,
-        price: medicine.price,
-        rank: medicine.rank,
-        disease_id: medicine.disease_id,
-        disease: null,
-        company_id: medicine.company_id,
-        company: null
-      };
-      
-      // Check if disease exists and has the expected structure with proper null checking
-      if (medicine.disease && 
-          typeof medicine.disease === 'object' && 
-          medicine.disease !== null &&
-          'disease_id' in medicine.disease && 
-          'name' in medicine.disease) {
-        result.disease = {
-          disease_id: medicine.disease.disease_id,
-          name: medicine.disease.name
-        };
-      }
-      
-      // Check if company exists and has the expected structure
-      if (medicine.company && 
-          typeof medicine.company === 'object' && 
-          'company_id' in medicine.company && 
-          'name' in medicine.company) {
-        result.company = {
-          company_id: medicine.company.company_id,
-          name: medicine.company.name
-        };
-      }
-      
-      return result;
-    });
+  return data.map(item => item.medicines);
 };
 
-// Fetch medicines by company with fixed relationship selection
-export const fetchMedicinesByCompany = async (companyId: number): Promise<Medicine[]> => {
+// Fetch medicines by company
+export const fetchMedicinesByCompany = async (companyId: number) => {
   const { data, error } = await supabase
     .from('medicines')
     .select(`
@@ -456,12 +302,10 @@ export const fetchMedicinesByCompany = async (companyId: number): Promise<Medici
       rank,
       disease_id,
       disease:disease_id (
-        disease_id,
         name
       ),
       company_id,
       company:company_id (
-        company_id,
         name
       )
     `)
@@ -469,45 +313,7 @@ export const fetchMedicinesByCompany = async (companyId: number): Promise<Medici
 
   if (error) throw error;
   
-  // Transform to ensure data conforms to Medicine type
-  return data.map(medicine => {
-    const result: Medicine = {
-      medicine_id: medicine.medicine_id,
-      name: medicine.name,
-      type: medicine.type,
-      price: medicine.price,
-      rank: medicine.rank,
-      disease_id: medicine.disease_id,
-      disease: null,
-      company_id: medicine.company_id,
-      company: null
-    };
-    
-    // Check if disease exists and has the expected structure with proper null checking
-    if (medicine.disease && 
-        typeof medicine.disease === 'object' && 
-        medicine.disease !== null &&
-        'disease_id' in medicine.disease && 
-        'name' in medicine.disease) {
-      result.disease = {
-        disease_id: medicine.disease.disease_id,
-        name: medicine.disease.name
-      };
-    }
-    
-    // Check if company exists and has the expected structure
-    if (medicine.company && 
-        typeof medicine.company === 'object' && 
-        'company_id' in medicine.company && 
-        'name' in medicine.company) {
-      result.company = {
-        company_id: medicine.company.company_id,
-        name: medicine.company.name
-      };
-    }
-    
-    return result;
-  });
+  return data;
 };
 
 // Fetch doctor specializations for filtering

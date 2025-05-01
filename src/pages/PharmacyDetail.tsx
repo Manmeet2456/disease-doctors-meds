@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -7,18 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Phone, Clock, Package } from 'lucide-react';
 import { fetchStockByPharmacy, fetchPharmacyById } from '@/services/supabase';
 import { toast } from '@/components/ui/use-toast';
-
-interface StockItem {
-  stock_id: number;
-  medicine_id: number;
-  quantity: number | null;
-  price_store: number | null;
-  medicines: {
-    medicine_id: number;
-    name: string;
-    type: string | null;
-  } | null;
-}
 
 const PharmacyDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,7 +20,7 @@ const PharmacyDetail = () => {
   });
   
   // Fetch pharmacy stock data
-  const { data: stockItemsData, isLoading: isLoadingStock } = useQuery({
+  const { data: stockItems, isLoading: isLoadingStock } = useQuery({
     queryKey: ['pharmacyStock', pharmacyId],
     queryFn: () => fetchStockByPharmacy(pharmacyId),
     meta: {
@@ -45,9 +34,6 @@ const PharmacyDetail = () => {
       }
     }
   });
-  
-  // Cast stock data to the correct type
-  const stockItems = stockItemsData as unknown as StockItem[] | undefined;
   
   const isLoading = isLoadingPharmacy || isLoadingStock;
   

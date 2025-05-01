@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
@@ -24,13 +25,10 @@ const Medicines = () => {
   }, [tabFromUrl]);
   
   // Fetch medicines data from Supabase
-  const { data: medicinesData, isLoading: isLoadingMedicines, error: medicinesError } = useQuery({
+  const { data: medicines, isLoading: isLoadingMedicines, error: medicinesError } = useQuery({
     queryKey: ['medicines'],
     queryFn: fetchMedicines
   });
-
-  // Cast the medicines data to the correct type
-  const medicines: Medicine[] | null = medicinesData as unknown as Medicine[] | null;
 
   // Fetch compositions data from Supabase
   const { data: compositions, isLoading: isLoadingCompositions, error: compositionsError } = useQuery({
@@ -142,7 +140,7 @@ const Medicines = () => {
           
           <TabsContent value="medicines">
             <MedicinesTabContent 
-              medicines={medicines}
+              medicines={medicines as Medicine[] | null}
               isLoading={isLoadingMedicines}
               onExport={handleExport}
             />
@@ -150,14 +148,14 @@ const Medicines = () => {
           
           <TabsContent value="compositions">
             <CompositionsTabContent 
-              compositions={compositions as Composition[]}
+              compositions={compositions as Composition[] | null}
               onExport={handleExport}
             />
           </TabsContent>
           
           <TabsContent value="companies">
             <CompaniesTabContent 
-              companies={companies as Company[]}
+              companies={companies as Company[] | null}
               onExport={handleExport}
             />
           </TabsContent>

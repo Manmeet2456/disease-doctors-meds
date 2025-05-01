@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Brain, Activity, Stethoscope } from 'lucide-react';
@@ -26,7 +27,7 @@ const CategorySection = () => {
   const [formattedCategories, setFormattedCategories] = useState<any[]>([]);
   
   useEffect(() => {
-    if (categories && Array.isArray(categories) && categories.length > 0) {
+    if (categories && categories.length > 0) {
       // Format the categories with appropriate icons and colors
       const formatted = categories.map((category: string, index: number) => {
         const { icon, color, bgColor } = getCategoryIcon(category);
