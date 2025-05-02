@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -15,6 +15,14 @@ import { Medicine, Composition, Company } from '@/types/medicine';
 const Medicines = () => {
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("medicines");
+  
+  // Set default tab based on URL params
+  useEffect(() => {
+    // If we have composition or company param, switch to medicines tab
+    if (searchParams.has('composition') || searchParams.has('company')) {
+      setActiveTab("medicines");
+    }
+  }, [searchParams]);
   
   // Fetch medicines data from Supabase
   const { data: medicines, isLoading: isLoadingMedicines, error: medicinesError } = useQuery({
@@ -79,6 +87,10 @@ const Medicines = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
   const isLoading = isLoadingMedicines || isLoadingCompositions || isLoadingCompanies;
   const hasError = medicinesError || compositionsError || companiesError;
 
@@ -121,7 +133,7 @@ const Medicines = () => {
           <p className="text-gray-600">Browse our comprehensive database of medicines, their compositions, prices, and availability.</p>
         </div>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-8">
           <div className="flex justify-between items-center mb-2">
             <TabsList>
               <TabsTrigger value="medicines">Medicines</TabsTrigger>
@@ -142,6 +154,7 @@ const Medicines = () => {
             <CompositionsTabContent 
               compositions={compositions as Composition[] | null}
               onExport={handleExport}
+              onSelectTab={handleTabChange}
             />
           </TabsContent>
           
@@ -149,6 +162,7 @@ const Medicines = () => {
             <CompaniesTabContent 
               companies={companies as Company[] | null}
               onExport={handleExport}
+              onSelectTab={handleTabChange}
             />
           </TabsContent>
         </Tabs>

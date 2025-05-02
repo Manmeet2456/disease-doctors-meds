@@ -7,9 +7,10 @@ import PharmacyCard from '@/components/pharmacies/PharmacyCard';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, X } from 'lucide-react';
 import { fetchPharmacies, fetchPharmaciesByMedicine } from '@/services/supabase';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from '@/components/ui/use-toast';
 
 const Pharmacies = () => {
   const [searchParams] = useSearchParams();
@@ -76,6 +77,23 @@ const Pharmacies = () => {
     
     setFilteredPharmacies(result);
   };
+  
+  const resetFilters = () => {
+    setSearchTerm('');
+    setSortBy('name-asc');
+    
+    // Reset to original data
+    if (medicineId && pharmaciesByMedicine) {
+      setFilteredPharmacies(pharmaciesByMedicine);
+    } else {
+      setFilteredPharmacies(pharmacies);
+    }
+    
+    toast({
+      title: "Filters Reset",
+      description: "All filters have been cleared.",
+    });
+  };
 
   if (isLoading || isLoadingByMedicine) {
     return (
@@ -106,8 +124,13 @@ const Pharmacies = () => {
         </div>
         
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Filter className="h-5 w-5 mr-2" /> Filter Pharmacies
+          <h3 className="text-lg font-semibold mb-4 flex items-center justify-between">
+            <div className="flex items-center">
+              <Filter className="h-5 w-5 mr-2" /> Filter Pharmacies
+            </div>
+            <Button variant="ghost" size="sm" onClick={resetFilters} className="flex items-center gap-1">
+              <X className="h-4 w-4" /> Clear Filters
+            </Button>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">

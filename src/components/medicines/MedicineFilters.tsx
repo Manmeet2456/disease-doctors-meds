@@ -6,19 +6,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Filter, X } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { useQuery } from '@tanstack/react-query';
-import { fetchMedicineTypes, fetchCompositions, fetchMaxMedicinePrice } from '@/services/supabase';
+import { fetchMedicineTypes, fetchCompositions, fetchMaxMedicinePrice, fetchCompanies } from '@/services/supabase';
 import { toast } from '@/components/ui/use-toast';
 
 interface MedicineFiltersProps {
   onFilterChange: (filters: any) => void;
+  initialFilters?: {
+    searchTerm: string;
+    type: string;
+    priceRange: number[];
+    composition: string;
+    company?: string;
+    sortBy: string;
+  };
 }
 
-const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('name-asc');
-  const [type, setType] = useState('all');
-  const [priceRange, setPriceRange] = useState<number[]>([0, 100]);
-  const [composition, setComposition] = useState('all');
+const MedicineFilters = ({ onFilterChange, initialFilters }: MedicineFiltersProps) => {
+  const [searchTerm, setSearchTerm] = useState(initialFilters?.searchTerm || '');
+  const [sortBy, setSortBy] = useState(initialFilters?.sortBy || 'name-asc');
+  const [type, setType] = useState(initialFilters?.type || 'all');
+  const [priceRange, setPriceRange] = useState<number[]>(initialFilters?.priceRange || [0, 100]);
+  const [composition, setComposition] = useState(initialFilters?.composition || 'all');
+  const [company, setCompany] = useState(initialFilters?.company || 'all');
   const [maxPrice, setMaxPrice] = useState(100);
   
   const { data: medicineTypes = [] } = useQuery({
@@ -31,6 +40,11 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
     queryFn: fetchCompositions
   });
   
+  const { data: companies = [] } = useQuery({
+    queryKey: ['companies'],
+    queryFn: fetchCompanies
+  });
+  
   // Fixed query to use proper syntax without onSuccess
   const { data: fetchedMaxPrice } = useQuery({
     queryKey: ['maxMedicinePrice'],
@@ -41,9 +55,23 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
   useEffect(() => {
     if (fetchedMaxPrice) {
       setMaxPrice(fetchedMaxPrice || 100);
-      setPriceRange([0, fetchedMaxPrice || 100]);
+      if (!initialFilters?.priceRange) {
+        setPriceRange([0, fetchedMaxPrice || 100]);
+      }
     }
-  }, [fetchedMaxPrice]);
+  }, [fetchedMaxPrice, initialFilters]);
+  
+  // Apply initial filters when they change
+  useEffect(() => {
+    if (initialFilters) {
+      setSearchTerm(initialFilters.searchTerm || '');
+      setSortBy(initialFilters.sortBy || 'name-asc');
+      setType(initialFilters.type || 'all');
+      setPriceRange(initialFilters.priceRange || [0, maxPrice]);
+      setComposition(initialFilters.composition || 'all');
+      setCompany(initialFilters.company || 'all');
+    }
+  }, [initialFilters, maxPrice]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -60,6 +88,10 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
   const handleCompositionChange = (value: string) => {
     setComposition(value);
   };
+  
+  const handleCompanyChange = (value: string) => {
+    setCompany(value);
+  };
 
   const handlePriceRangeChange = (value: number[]) => {
     setPriceRange(value);
@@ -71,7 +103,8 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
       sortBy,
       type,
       priceRange,
-      composition
+      composition,
+      company
     });
   };
   
@@ -81,14 +114,22 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
     setType('all');
     setPriceRange([0, maxPrice]);
     setComposition('all');
+    setCompany('all');
     
     onFilterChange({
       searchTerm: '',
       sortBy: 'name-asc',
       type: 'all',
       priceRange: [0, maxPrice],
-      composition: 'all'
+      composition: 'all',
+      company: 'all'
     });
+    
+    // Clear URL parameters
+    const url = new URL(window.location.href);
+    url.searchParams.delete('composition');
+    url.searchParams.delete('company');
+    window.history.pushState({}, '', url.toString());
     
     toast({
       title: "Filters Reset",
@@ -181,20 +222,38 @@ const MedicineFilters = ({ onFilterChange }: MedicineFiltersProps) => {
           </div>
         </div>
         
-        <div>
-          <Select value={composition} onValueChange={handleCompositionChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by Composition" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Compositions</SelectItem>
-              {compositions.map((comp: any) => (
-                <SelectItem key={comp.composition_id} value={comp.composition_id.toString()}>
-                  {comp.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Select value={composition} onValueChange={handleCompositionChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by Composition" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Compositions</SelectItem>
+                {compositions.map((comp: any) => (
+                  <SelectItem key={comp.composition_id} value={comp.composition_id.toString()}>
+                    {comp.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Select value={company} onValueChange={handleCompanyChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by Company" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Companies</SelectItem>
+                {companies.map((comp: any) => (
+                  <SelectItem key={comp.company_id} value={comp.company_id.toString()}>
+                    {comp.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
       <div className="mt-6 flex justify-end">

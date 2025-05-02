@@ -9,9 +9,10 @@ import { Link } from 'react-router-dom';
 interface CompositionsTabContentProps {
   compositions: Composition[] | null;
   onExport: () => void;
+  onSelectTab: (tab: string) => void;
 }
 
-const CompositionsTabContent = ({ compositions, onExport }: CompositionsTabContentProps) => {
+const CompositionsTabContent = ({ compositions, onExport, onSelectTab }: CompositionsTabContentProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   
   const filteredCompositions = compositions ? compositions.filter(
@@ -37,14 +38,25 @@ const CompositionsTabContent = ({ compositions, onExport }: CompositionsTabConte
       {filteredCompositions && filteredCompositions.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredCompositions.map((composition) => (
-            <Link
+            <div
               key={composition.composition_id}
-              to={`/medicines?composition=${composition.composition_id}`}
               className="p-4 border rounded-md hover:bg-primary-50 hover:border-primary transition-colors flex items-center justify-between"
             >
               <h4 className="font-medium">{composition.name}</h4>
-              <Button variant="ghost" size="sm">View Medicines</Button>
-            </Link>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => {
+                  onSelectTab('medicines');
+                  // This will be caught by the MedicinesTabContent to filter by composition
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('composition', composition.composition_id.toString());
+                  window.history.pushState({}, '', url.toString());
+                }}
+              >
+                View Medicines
+              </Button>
+            </div>
           ))}
         </div>
       ) : (

@@ -11,6 +11,11 @@ import { fetchDoctors, fetchDoctorsByDisease } from '@/services/supabase';
 const Doctors = () => {
   const [searchParams] = useSearchParams();
   const [filteredDoctors, setFilteredDoctors] = useState<any[]>([]);
+  const [initialFilters, setInitialFilters] = useState({
+    searchTerm: '',
+    sortBy: 'name-asc',
+    specialization: 'all'
+  });
   
   const diseaseId = searchParams.get('disease') ? parseInt(searchParams.get('disease') || '0') : null;
   
@@ -95,6 +100,16 @@ const Doctors = () => {
     return images[index % images.length];
   };
 
+  // Fix doctor name to not have duplicate "Dr."
+  const formatDoctorName = (name: string) => {
+    // Check if name already starts with Dr.
+    if (name.startsWith('Dr.')) {
+      return name; // Already has Dr., return as is
+    } else {
+      return `Dr. ${name}`; // Add Dr. if it doesn't have it
+    }
+  };
+
   if (isLoadingAllDoctors || isLoadingByDisease) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
@@ -123,7 +138,7 @@ const Doctors = () => {
           )}
         </div>
         
-        <DoctorFilters onFilterChange={handleFilterChange} />
+        <DoctorFilters onFilterChange={handleFilterChange} initialFilters={initialFilters} />
         
         {filteredDoctors.length === 0 ? (
           <div className="bg-white p-8 rounded-lg shadow-md text-center">
@@ -137,7 +152,7 @@ const Doctors = () => {
                 key={doctor.doctor_id} 
                 doctor={{
                   id: doctor.doctor_id,
-                  name: doctor.name,
+                  name: formatDoctorName(doctor.name),
                   specialization: doctor.specialization || 'General Practitioner',
                   hospital: doctor.hospital || 'Not specified',
                   contact_info: doctor.contact_info || 'No contact info available',

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import MedicineCard from '@/components/medicines/MedicineCard';
 import MedicineFilters from '@/components/medicines/MedicineFilters';
@@ -23,10 +22,12 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
     type: 'all',
     priceRange: [0, 100],
     composition: 'all',
+    company: 'all',
     sortBy: 'name-asc'
   });
   
   const compositionId = searchParams.get('composition') ? parseInt(searchParams.get('composition') || '0') : null;
+  const companyId = searchParams.get('company') ? parseInt(searchParams.get('company') || '0') : null;
   
   const { data: medicinesByComposition, isLoading: isCompositionLoading } = useQuery({
     queryKey: ['medicinesByComposition', compositionId],
@@ -46,11 +47,32 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
       } else if (compositionId && medicinesByComposition) {
         // If we have a composition filter from URL, use the fetched medicines
         setFilteredMedicines(medicinesByComposition);
+      } else if (companyId) {
+        // Filter by company if company ID is in URL
+        const filtered = medicines.filter(medicine => 
+          medicine.company_id === companyId
+        );
+        setFilteredMedicines(filtered);
       } else {
         setFilteredMedicines(medicines);
       }
+      
+      // Update active filters based on URL params
+      if (compositionId) {
+        setActiveFilters(prev => ({
+          ...prev,
+          composition: compositionId.toString()
+        }));
+      }
+      
+      if (companyId) {
+        setActiveFilters(prev => ({
+          ...prev,
+          company: companyId.toString()
+        }));
+      }
     }
-  }, [medicines, searchParams, compositionId, medicinesByComposition]);
+  }, [medicines, searchParams, compositionId, companyId, medicinesByComposition]);
 
   const handleFilterChange = (filters: any) => {
     setActiveFilters(filters);
@@ -212,7 +234,10 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         </div>
       </div>
       
-      <MedicineFilters onFilterChange={handleFilterChange} />
+      <MedicineFilters 
+        onFilterChange={handleFilterChange} 
+        initialFilters={activeFilters}
+      />
       
       {filteredMedicines.length === 0 ? (
         <div className="bg-white p-8 rounded-lg shadow-md text-center">
