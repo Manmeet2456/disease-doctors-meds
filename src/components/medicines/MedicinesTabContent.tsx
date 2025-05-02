@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { Medicine } from '@/types/medicine';
 import { useQuery } from '@tanstack/react-query';
-import { fetchMedicinesByComposition } from '@/services/supabase';
+import { fetchMedicinesByComposition, fetchMedicines } from '@/services/supabase';
 import { useSearchParams } from 'react-router-dom';
 
 interface MedicinesTabContentProps {
@@ -30,6 +30,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
   const compositionId = searchParams.get('composition') ? parseInt(searchParams.get('composition') || '0') : null;
   const companyId = searchParams.get('company') ? parseInt(searchParams.get('company') || '0') : null;
   
+  // Fetch medicines by composition if needed
   const { data: medicinesByComposition, isLoading: isCompositionLoading } = useQuery({
     queryKey: ['medicinesByComposition', compositionId],
     queryFn: () => fetchMedicinesByComposition(compositionId || 0),
@@ -47,7 +48,6 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         setFilteredMedicines(filtered);
       } else if (compositionId && medicinesByComposition) {
         // If we have a composition filter from URL, use the fetched medicines
-        // We need to cast because we fixed the return type in the function
         setFilteredMedicines(medicinesByComposition as Medicine[]);
       } else if (companyId) {
         // Filter by company if company ID is in URL
@@ -94,9 +94,40 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
       result = [...medicines];
     }
     
-    // If we have a composition filter
+    // Apply search term filter
+    if (filters.searchTerm) {
+      const term = filters.searchTerm.toLowerCase();
+      result = result.filter(medicine => 
+        medicine.name.toLowerCase().includes(term) || 
+        (medicine.disease && medicine.disease?.name && medicine.disease.name.toLowerCase().includes(term)) || 
+        (medicine.company && medicine.company?.name && medicine.company.name.toLowerCase().includes(term))
+      );
+    }
+    
+    // Apply type filter
+    if (filters.type && filters.type !== 'all') {
+      result = result.filter(medicine => 
+        medicine.type && medicine.type.toLowerCase() === filters.type.toLowerCase()
+      );
+    }
+    
+    // Apply company filter - Fix to properly filter by company
+    if (filters.company && filters.company !== 'all') {
+      const companyIdFilter = parseInt(filters.company);
+      result = result.filter(medicine => medicine.company_id === companyIdFilter);
+    }
+    
+    // Apply price range filter
+    if (filters.priceRange) {
+      const [min, max] = filters.priceRange;
+      result = result.filter(medicine => 
+        medicine.price !== null && medicine.price >= min && medicine.price <= max
+      );
+    }
+    
+    // Apply composition filter
     if (filters.composition && filters.composition !== 'all') {
-      // Fetch medicines by composition directly from API
+      // For composition filtering, we need to fetch medicines by composition directly
       const compositionIdToUse = parseInt(filters.composition);
       
       // Use the fetchMedicinesByComposition function directly
@@ -111,8 +142,8 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
               const term = filters.searchTerm.toLowerCase();
               filteredResult = filteredResult.filter(medicine => 
                 medicine.name.toLowerCase().includes(term) || 
-                (medicine.disease && medicine.disease.name && medicine.disease.name.toLowerCase().includes(term)) || 
-                (medicine.company && medicine.company.name && medicine.company.name.toLowerCase().includes(term))
+                (medicine.disease && medicine.disease?.name && medicine.disease.name.toLowerCase().includes(term)) || 
+                (medicine.company && medicine.company?.name && medicine.company.name.toLowerCase().includes(term))
               );
             }
             
@@ -121,6 +152,12 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
               filteredResult = filteredResult.filter(medicine => 
                 medicine.type && medicine.type.toLowerCase() === filters.type.toLowerCase()
               );
+            }
+            
+            // Apply company filter
+            if (filters.company && filters.company !== 'all') {
+              const companyIdFilter = parseInt(filters.company);
+              filteredResult = filteredResult.filter(medicine => medicine.company_id === companyIdFilter);
             }
             
             // Apply price range filter
@@ -143,31 +180,6 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
       
       // Return early since we're fetching data asynchronously
       return;
-    }
-    
-    // Apply search term filter
-    if (filters.searchTerm) {
-      const term = filters.searchTerm.toLowerCase();
-      result = result.filter(medicine => 
-        medicine.name.toLowerCase().includes(term) || 
-        (medicine.disease && medicine.disease.name && medicine.disease.name.toLowerCase().includes(term)) || 
-        (medicine.company && medicine.company.name && medicine.company.name.toLowerCase().includes(term))
-      );
-    }
-    
-    // Apply type filter
-    if (filters.type && filters.type !== 'all') {
-      result = result.filter(medicine => 
-        medicine.type && medicine.type.toLowerCase() === filters.type.toLowerCase()
-      );
-    }
-    
-    // Apply price range filter
-    if (filters.priceRange) {
-      const [min, max] = filters.priceRange;
-      result = result.filter(medicine => 
-        medicine.price !== null && medicine.price >= min && medicine.price <= max
-      );
     }
     
     // Apply sorting

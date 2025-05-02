@@ -117,7 +117,7 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   // Extract medicine IDs
   const medicineIds = medicineCompositions.map(mc => mc.medicine_id);
   
-  // Fix the query by using the foreign key directly instead of trying to join
+  // Fetch medicines
   const { data: medicines, error } = await supabase
     .from('medicines')
     .select('*')
@@ -125,33 +125,11 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   
   if (error) throw error;
   
-  // Get associated disease and company data separately
+  // Get associated disease and company data separately for each medicine
   const medicinesWithRelations = await Promise.all(
     medicines.map(async (med) => {
-      let diseaseData = null;
-      let companyData = null;
-      
-      if (med.disease_id) {
-        const { data: disease } = await supabase
-          .from('disease')
-          .select('disease_id, name')
-          .eq('disease_id', med.disease_id)
-          .single();
-        
-        diseaseData = disease || null;
-      }
-      
-      if (med.company_id) {
-        const { data: company } = await supabase
-          .from('companies')
-          .select('company_id, name')
-          .eq('company_id', med.company_id)
-          .single();
-        
-        companyData = company || null;
-      }
-      
-      return {
+      // Create a base medicine object
+      let medicineData = {
         medicine_id: med.medicine_id,
         name: med.name,
         type: med.type,
@@ -159,9 +137,43 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
         rank: med.rank,
         company_id: med.company_id,
         disease_id: med.disease_id,
-        disease: diseaseData,
-        company: companyData
+        disease: null as any,
+        company: null as any
       };
+      
+      // Fetch disease data if available
+      if (med.disease_id) {
+        const { data: disease } = await supabase
+          .from('disease')
+          .select('*')
+          .eq('disease_id', med.disease_id)
+          .single();
+        
+        if (disease) {
+          medicineData.disease = {
+            disease_id: disease.disease_id,
+            name: disease.name
+          };
+        }
+      }
+      
+      // Fetch company data if available
+      if (med.company_id) {
+        const { data: company } = await supabase
+          .from('companies')
+          .select('*')
+          .eq('company_id', med.company_id)
+          .single();
+        
+        if (company) {
+          medicineData.company = {
+            company_id: company.company_id,
+            name: company.name
+          };
+        }
+      }
+      
+      return medicineData;
     })
   );
   
@@ -248,32 +260,8 @@ export const fetchMedicineById = async (medicineId: number) => {
   
   if (error) throw error;
   
-  // Get associated disease data if available
-  let diseaseData = null;
-  if (medicine.disease_id) {
-    const { data: disease } = await supabase
-      .from('disease')
-      .select('disease_id, name')
-      .eq('disease_id', medicine.disease_id)
-      .single();
-    
-    diseaseData = disease || null;
-  }
-  
-  // Get associated company data if available
-  let companyData = null;
-  if (medicine.company_id) {
-    const { data: company } = await supabase
-      .from('companies')
-      .select('company_id, name')
-      .eq('company_id', medicine.company_id)
-      .single();
-    
-    companyData = company || null;
-  }
-  
-  // Transform data to match Medicine type
-  return {
+  // Create a base medicine object
+  let medicineData = {
     medicine_id: medicine.medicine_id,
     name: medicine.name,
     type: medicine.type,
@@ -281,9 +269,43 @@ export const fetchMedicineById = async (medicineId: number) => {
     rank: medicine.rank,
     company_id: medicine.company_id,
     disease_id: medicine.disease_id,
-    disease: diseaseData,
-    company: companyData
+    disease: null as any,
+    company: null as any
   };
+  
+  // Get associated disease data if available
+  if (medicine.disease_id) {
+    const { data: disease } = await supabase
+      .from('disease')
+      .select('*')
+      .eq('disease_id', medicine.disease_id)
+      .single();
+    
+    if (disease) {
+      medicineData.disease = {
+        disease_id: disease.disease_id,
+        name: disease.name
+      };
+    }
+  }
+  
+  // Get associated company data if available
+  if (medicine.company_id) {
+    const { data: company } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('company_id', medicine.company_id)
+      .single();
+    
+    if (company) {
+      medicineData.company = {
+        company_id: company.company_id,
+        name: company.name
+      };
+    }
+  }
+  
+  return medicineData;
 };
 
 // Fetch medicine compositions
@@ -329,30 +351,8 @@ export const fetchMedicines = async () => {
   // Get associated disease and company data for each medicine
   const medicinesWithRelations = await Promise.all(
     medicines.map(async (med) => {
-      let diseaseData = null;
-      let companyData = null;
-      
-      if (med.disease_id) {
-        const { data: disease } = await supabase
-          .from('disease')
-          .select('disease_id, name')
-          .eq('disease_id', med.disease_id)
-          .single();
-        
-        diseaseData = disease || null;
-      }
-      
-      if (med.company_id) {
-        const { data: company } = await supabase
-          .from('companies')
-          .select('company_id, name')
-          .eq('company_id', med.company_id)
-          .single();
-        
-        companyData = company || null;
-      }
-      
-      return {
+      // Create a base medicine object
+      let medicineData = {
         medicine_id: med.medicine_id,
         name: med.name,
         type: med.type,
@@ -360,9 +360,43 @@ export const fetchMedicines = async () => {
         rank: med.rank,
         company_id: med.company_id,
         disease_id: med.disease_id,
-        disease: diseaseData,
-        company: companyData
+        disease: null as any,
+        company: null as any
       };
+      
+      // Fetch disease data if available
+      if (med.disease_id) {
+        const { data: disease } = await supabase
+          .from('disease')
+          .select('*')
+          .eq('disease_id', med.disease_id)
+          .single();
+        
+        if (disease) {
+          medicineData.disease = {
+            disease_id: disease.disease_id,
+            name: disease.name
+          };
+        }
+      }
+      
+      // Fetch company data if available
+      if (med.company_id) {
+        const { data: company } = await supabase
+          .from('companies')
+          .select('*')
+          .eq('company_id', med.company_id)
+          .single();
+        
+        if (company) {
+          medicineData.company = {
+            company_id: company.company_id,
+            name: company.name
+          };
+        }
+      }
+      
+      return medicineData;
     })
   );
   

@@ -17,7 +17,7 @@ export type Database = {
           rank: number | null
         }
         Insert: {
-          company_id?: number
+          company_id: number
           contact_info?: string | null
           name: string
           rank?: number | null
@@ -36,7 +36,7 @@ export type Database = {
           name: string
         }
         Insert: {
-          composition_id?: number
+          composition_id: number
           name: string
         }
         Update: {
@@ -49,7 +49,7 @@ export type Database = {
         Row: {
           category: string
           description: string | null
-          disease_id: number
+          disease_id: string
           name: string
           symptoms: string | null
           treatment: string | null
@@ -57,7 +57,7 @@ export type Database = {
         Insert: {
           category?: string
           description?: string | null
-          disease_id?: number
+          disease_id: string
           name: string
           symptoms?: string | null
           treatment?: string | null
@@ -65,7 +65,7 @@ export type Database = {
         Update: {
           category?: string
           description?: string | null
-          disease_id?: number
+          disease_id?: string
           name?: string
           symptoms?: string | null
           treatment?: string | null
@@ -83,7 +83,7 @@ export type Database = {
         }
         Insert: {
           contact_info?: string | null
-          doctor_id?: number
+          doctor_id: number
           experience_years?: number | null
           hospital?: string | null
           name: string
@@ -132,7 +132,7 @@ export type Database = {
       medicines: {
         Row: {
           company_id: number | null
-          disease_id: number | null
+          disease_id: string | null
           medicine_id: number
           name: string
           price: number | null
@@ -141,8 +141,8 @@ export type Database = {
         }
         Insert: {
           company_id?: number | null
-          disease_id?: number | null
-          medicine_id?: number
+          disease_id?: string | null
+          medicine_id: number
           name: string
           price?: number | null
           rank?: number | null
@@ -150,7 +150,7 @@ export type Database = {
         }
         Update: {
           company_id?: number | null
-          disease_id?: number | null
+          disease_id?: string | null
           medicine_id?: number
           name?: string
           price?: number | null
@@ -158,13 +158,6 @@ export type Database = {
           type?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "disease_id_fk"
-            columns: ["disease_id"]
-            isOneToOne: false
-            referencedRelation: "disease"
-            referencedColumns: ["disease_id"]
-          },
           {
             foreignKeyName: "medicines_company_id_fkey"
             columns: ["company_id"]
@@ -192,7 +185,7 @@ export type Database = {
           contact_info?: string | null
           location?: string | null
           name: string
-          pharmacy_id?: number
+          pharmacy_id: number
         }
         Update: {
           contact_info?: string | null
@@ -215,7 +208,7 @@ export type Database = {
           pharmacy_id?: number | null
           price_store?: number | null
           quantity?: number | null
-          stock_id?: number
+          stock_id: number
         }
         Update: {
           medicine_id?: number | null
@@ -243,15 +236,15 @@ export type Database = {
       }
       treated_by: {
         Row: {
-          disease_id: number
+          disease_id: string
           doctor_id: number
         }
         Insert: {
-          disease_id: number
+          disease_id: string
           doctor_id: number
         }
         Update: {
-          disease_id?: number
+          disease_id?: string
           doctor_id?: number
         }
         Relationships: [
