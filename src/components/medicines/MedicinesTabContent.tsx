@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import MedicineCard from '@/components/medicines/MedicineCard';
 import MedicineFilters from '@/components/medicines/MedicineFilters';
@@ -46,7 +47,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         setFilteredMedicines(filtered);
       } else if (compositionId && medicinesByComposition) {
         // If we have a composition filter from URL, use the fetched medicines
-        setFilteredMedicines(medicinesByComposition);
+        setFilteredMedicines(medicinesByComposition as Medicine[]);
       } else if (companyId) {
         // Filter by company if company ID is in URL
         const filtered = medicines.filter(medicine => 
@@ -102,15 +103,15 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         .then(compositionMedicines => {
           if (compositionMedicines) {
             // Apply remaining filters to these composition-specific medicines
-            let filteredResult = [...compositionMedicines];
+            let filteredResult = [...compositionMedicines as Medicine[]];
             
             // Apply search term filter
             if (filters.searchTerm) {
               const term = filters.searchTerm.toLowerCase();
               filteredResult = filteredResult.filter(medicine => 
                 medicine.name.toLowerCase().includes(term) || 
-                (medicine.disease?.name && medicine.disease.name.toLowerCase().includes(term)) || 
-                (medicine.company?.name && medicine.company.name.toLowerCase().includes(term))
+                (medicine.disease && medicine.disease.name && medicine.disease.name.toLowerCase().includes(term)) || 
+                (medicine.company && medicine.company.name && medicine.company.name.toLowerCase().includes(term))
               );
             }
             
@@ -148,8 +149,8 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
       const term = filters.searchTerm.toLowerCase();
       result = result.filter(medicine => 
         medicine.name.toLowerCase().includes(term) || 
-        (medicine.disease?.name && medicine.disease.name.toLowerCase().includes(term)) || 
-        (medicine.company?.name && medicine.company.name.toLowerCase().includes(term))
+        (medicine.disease && medicine.disease.name && medicine.disease.name.toLowerCase().includes(term)) || 
+        (medicine.company && medicine.company.name && medicine.company.name.toLowerCase().includes(term))
       );
     }
     

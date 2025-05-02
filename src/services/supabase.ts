@@ -118,11 +118,17 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   const medicineIds = medicineCompositions.map(mc => mc.medicine_id);
   
   // Fetch full medicine details with related disease and company data
-  // Fixed: Use specific column references to avoid ambiguity
+  // Fixed: Use explicit column references to avoid ambiguity
   const { data: medicines, error } = await supabase
     .from('medicines')
     .select(`
-      *,
+      medicine_id,
+      name,
+      type,
+      price,
+      rank,
+      company_id,
+      disease_id,
       disease:disease_id(disease_id, name),
       company:company_id(company_id, name)
     `)
@@ -205,7 +211,13 @@ export const fetchMedicineById = async (medicineId: number) => {
   const { data, error } = await supabase
     .from('medicines')
     .select(`
-      *,
+      medicine_id,
+      name,
+      type,
+      price,
+      rank,
+      company_id,
+      disease_id,
       disease:disease_id(disease_id, name),
       company:company_id(company_id, name)
     `)
@@ -252,7 +264,13 @@ export const fetchMedicines = async () => {
   const { data, error } = await supabase
     .from('medicines')
     .select(`
-      *,
+      medicine_id,
+      name,
+      type,
+      price,
+      rank,
+      company_id,
+      disease_id,
       disease:disease_id(disease_id, name),
       company:company_id(company_id, name)
     `)
