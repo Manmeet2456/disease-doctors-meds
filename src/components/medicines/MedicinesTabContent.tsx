@@ -10,7 +10,7 @@ import { fetchMedicinesByComposition } from '@/services/supabase';
 import { useSearchParams } from 'react-router-dom';
 
 interface MedicinesTabContentProps {
-  medicines: Medicine[] | null;
+  medicines: Medicine[];
   isLoading: boolean;
   onExport: () => void;
 }
