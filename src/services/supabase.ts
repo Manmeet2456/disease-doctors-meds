@@ -117,34 +117,40 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   // Extract medicine IDs
   const medicineIds = medicineCompositions.map(mc => mc.medicine_id);
   
-  // Fetch full medicine details with related disease and company data
-  // Use explicit column aliases to avoid ambiguity
+  // Corrected query that properly separates the relationship
   const { data: medicines, error } = await supabase
     .from('medicines')
     .select(`
-      medicine_id,
-      name,
-      type,
-      price,
-      rank,
-      company_id,
-      disease_id,
-      disease:disease(disease_id, name),
-      company:company_id(company_id, name)
+      *,
+      disease:disease_id (
+        disease_id,
+        name
+      ),
+      company:company_id (
+        company_id,
+        name
+      )
     `)
     .in('medicine_id', medicineIds);
   
   if (error) throw error;
   
   // Transform data to match Medicine type before returning
-  return medicines.map(med => ({
-    ...med,
-    disease: med.disease ? {
-      disease_id: med.disease.disease_id,
-      name: med.disease.name
-    } : null,
-    company: med.company || null
-  }));
+  const transformedMedicines = medicines.map(med => {
+    return {
+      medicine_id: med.medicine_id,
+      name: med.name,
+      type: med.type,
+      price: med.price,
+      rank: med.rank,
+      company_id: med.company_id,
+      disease_id: med.disease_id,
+      disease: med.disease || null,
+      company: med.company || null
+    };
+  });
+  
+  return transformedMedicines;
 };
 
 // Fetch disease by ID
@@ -219,30 +225,35 @@ export const fetchMedicineById = async (medicineId: number) => {
   const { data, error } = await supabase
     .from('medicines')
     .select(`
-      medicine_id,
-      name,
-      type,
-      price,
-      rank,
-      company_id,
-      disease_id,
-      disease:disease(disease_id, name),
-      company:company_id(company_id, name)
+      *,
+      disease:disease_id (
+        disease_id,
+        name
+      ),
+      company:company_id (
+        company_id,
+        name
+      )
     `)
     .eq('medicine_id', medicineId)
     .single();
   
   if (error) throw error;
   
-  // Transform data to match Medicine type before returning
-  return {
-    ...data,
-    disease: data.disease ? {
-      disease_id: data.disease.disease_id,
-      name: data.disease.name
-    } : null,
+  // Transform data to match Medicine type
+  const transformedMedicine = {
+    medicine_id: data.medicine_id,
+    name: data.name,
+    type: data.type,
+    price: data.price,
+    rank: data.rank,
+    company_id: data.company_id,
+    disease_id: data.disease_id,
+    disease: data.disease || null,
     company: data.company || null
   };
+  
+  return transformedMedicine;
 };
 
 // Fetch medicine compositions
@@ -280,29 +291,36 @@ export const fetchMedicines = async () => {
   const { data, error } = await supabase
     .from('medicines')
     .select(`
-      medicine_id,
-      name,
-      type,
-      price,
-      rank,
-      company_id,
-      disease_id,
-      disease:disease(disease_id, name),
-      company:company_id(company_id, name)
+      *,
+      disease:disease_id (
+        disease_id,
+        name
+      ),
+      company:company_id (
+        company_id,
+        name
+      )
     `)
     .order('name');
   
   if (error) throw error;
   
-  // Transform data to match Medicine type before returning
-  return data.map(med => ({
-    ...med,
-    disease: med.disease ? {
-      disease_id: med.disease.disease_id,
-      name: med.disease.name
-    } : null,
-    company: med.company || null
-  }));
+  // Transform data to match Medicine type
+  const transformedMedicines = data.map(med => {
+    return {
+      medicine_id: med.medicine_id,
+      name: med.name,
+      type: med.type,
+      price: med.price,
+      rank: med.rank,
+      company_id: med.company_id,
+      disease_id: med.disease_id,
+      disease: med.disease || null,
+      company: med.company || null
+    };
+  });
+  
+  return transformedMedicines;
 };
 
 // Fetch all pharmacies
