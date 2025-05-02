@@ -118,13 +118,13 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   const medicineIds = medicineCompositions.map(mc => mc.medicine_id);
   
   // Fetch full medicine details with related disease and company data
-  // Fixed: Use explicit column names for foreign key relationships
+  // Fixed: Use specific column references to avoid ambiguity
   const { data: medicines, error } = await supabase
     .from('medicines')
     .select(`
       *,
-      disease:disease_id (disease_id, name),
-      company:company_id (company_id, name)
+      disease:disease_id(disease_id, name),
+      company:company_id(company_id, name)
     `)
     .in('medicine_id', medicineIds);
   
@@ -206,8 +206,8 @@ export const fetchMedicineById = async (medicineId: number) => {
     .from('medicines')
     .select(`
       *,
-      disease:disease_id (disease_id, name),
-      company:company_id (company_id, name)
+      disease:disease_id(disease_id, name),
+      company:company_id(company_id, name)
     `)
     .eq('medicine_id', medicineId)
     .single();
@@ -253,8 +253,8 @@ export const fetchMedicines = async () => {
     .from('medicines')
     .select(`
       *,
-      disease:disease_id (disease_id, name),
-      company:company_id (company_id, name)
+      disease:disease_id(disease_id, name),
+      company:company_id(company_id, name)
     `)
     .order('name');
   
@@ -314,7 +314,7 @@ export const fetchStockByPharmacy = async (pharmacyId: number) => {
     .from('stock')
     .select(`
       *,
-      medicines:medicine_id (*)
+      medicines:medicine_id(*)
     `)
     .eq('pharmacy_id', pharmacyId);
   

@@ -26,6 +26,16 @@ const CompositionsTabContent = ({ compositions, onExport, onSelectTab }: Composi
     setSearchTerm('');
   };
   
+  const handleViewMedicines = (compositionId: number) => {
+    // Set URL parameter for composition filtering
+    const url = new URL(window.location.href);
+    url.searchParams.set('composition', compositionId.toString());
+    window.history.pushState({}, '', url.toString());
+    
+    // Switch to the medicines tab
+    onSelectTab('medicines');
+  };
+  
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mb-8">
       <h3 className="text-lg font-semibold mb-4 flex items-center justify-between">
@@ -62,15 +72,7 @@ const CompositionsTabContent = ({ compositions, onExport, onSelectTab }: Composi
                   variant="secondary" 
                   size="sm" 
                   className="w-full mt-2"
-                  onClick={() => {
-                    // Set URL parameter for composition filtering
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('composition', composition.composition_id.toString());
-                    window.history.pushState({}, '', url.toString());
-                    
-                    // Switch to the medicines tab
-                    onSelectTab('medicines');
-                  }}
+                  onClick={() => handleViewMedicines(composition.composition_id)}
                 >
                   View Medicines
                 </Button>

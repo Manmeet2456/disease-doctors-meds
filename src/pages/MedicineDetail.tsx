@@ -147,7 +147,7 @@ const MedicineDetail = () => {
                       <TableBody>
                         {compositions.map((comp) => (
                           <TableRow key={comp.composition_id}>
-                            <TableCell>{comp.compositions?.name || 'Unknown'}</TableCell>
+                            <TableCell>{comp.name}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
