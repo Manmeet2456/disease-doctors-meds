@@ -47,11 +47,13 @@ const CompositionsTabContent = ({ compositions, onExport, onSelectTab }: Composi
                 variant="ghost" 
                 size="sm" 
                 onClick={() => {
-                  onSelectTab('medicines');
-                  // This will be caught by the MedicinesTabContent to filter by composition
+                  // Set URL parameter for composition filtering
                   const url = new URL(window.location.href);
                   url.searchParams.set('composition', composition.composition_id.toString());
                   window.history.pushState({}, '', url.toString());
+                  
+                  // Switch to the medicines tab
+                  onSelectTab('medicines');
                 }}
               >
                 View Medicines

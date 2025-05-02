@@ -15,11 +15,11 @@ const PharmacyDetail = () => {
   
   // Fetch pharmacy details
   const { data: pharmacies, isLoading: isLoadingPharmacy } = useQuery({
-    queryKey: ['pharmacy', pharmacyId],
-    queryFn: fetchPharmacies,
+    queryKey: ['pharmacies'],
+    queryFn: fetchPharmacies
   });
   
-  // Fetch pharmacy stock data with correct React Query syntax
+  // Fetch pharmacy stock data
   const { data: stockItems, isLoading: isLoadingStock } = useQuery({
     queryKey: ['pharmacyStock', pharmacyId],
     queryFn: () => fetchStockByPharmacy(pharmacyId),

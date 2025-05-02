@@ -3,68 +3,91 @@ import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { fetchDiseaseCategories } from '@/services/supabase';
+import { toast } from '@/components/ui/use-toast';
 
 interface DiseaseFiltersProps {
   onFilterChange: (filters: any) => void;
+  initialFilters?: {
+    searchTerm: string;
+    category: string;
+    sortBy: string;
+  };
 }
 
-const DiseaseFilters = ({ onFilterChange }: DiseaseFiltersProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('name-asc');
-  const [category, setCategory] = useState('all');
-  const [categories, setCategories] = useState<string[]>([]);
-
-  const { data: categoriesData } = useQuery({
+const DiseaseFilters = ({ onFilterChange, initialFilters }: DiseaseFiltersProps) => {
+  const [searchTerm, setSearchTerm] = useState(initialFilters?.searchTerm || '');
+  const [category, setCategory] = useState(initialFilters?.category || 'all');
+  const [sortBy, setSortBy] = useState(initialFilters?.sortBy || 'name-asc');
+  
+  // Fetch disease categories
+  const { data: categories = [] } = useQuery({
     queryKey: ['diseaseCategories'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('disease')
-        .select('category')
-        .not('category', 'is', null);
-      
-      if (error) throw error;
-      
-      // Extract unique categories
-      const allCategories = data.map(item => item.category);
-      const uniqueCategories = Array.from(new Set(allCategories)).filter(Boolean);
-      
-      return uniqueCategories;
-    }
+    queryFn: fetchDiseaseCategories
   });
-
+  
+  // Apply initial filters when they change
   useEffect(() => {
-    if (categoriesData) {
-      setCategories(categoriesData);
+    if (initialFilters) {
+      setSearchTerm(initialFilters.searchTerm || '');
+      setCategory(initialFilters.category || 'all');
+      setSortBy(initialFilters.sortBy || 'name-asc');
     }
-  }, [categoriesData]);
+  }, [initialFilters]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-  };
-
-  const handleSortChange = (value: string) => {
-    setSortBy(value);
   };
 
   const handleCategoryChange = (value: string) => {
     setCategory(value);
   };
 
+  const handleSortChange = (value: string) => {
+    setSortBy(value);
+  };
+
   const applyFilters = () => {
     onFilterChange({
       searchTerm,
-      sortBy,
-      category
+      category,
+      sortBy
+    });
+  };
+  
+  const resetFilters = () => {
+    setSearchTerm('');
+    setCategory('all');
+    setSortBy('name-asc');
+    
+    onFilterChange({
+      searchTerm: '',
+      category: 'all',
+      sortBy: 'name-asc'
+    });
+    
+    // Clear URL parameters
+    const url = new URL(window.location.href);
+    url.searchParams.delete('category');
+    window.history.pushState({}, '', url.toString());
+    
+    toast({
+      title: "Filters Reset",
+      description: "All filters have been cleared.",
     });
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-      <h3 className="text-lg font-semibold mb-4 flex items-center">
-        <Filter className="h-5 w-5 mr-2" /> Filter Diseases
+      <h3 className="text-lg font-semibold mb-4 flex items-center justify-between">
+        <div className="flex items-center">
+          <Filter className="h-5 w-5 mr-2" /> Filter Diseases
+        </div>
+        <Button variant="ghost" size="sm" onClick={resetFilters} className="flex items-center gap-1">
+          <X className="h-4 w-4" /> Clear Filters
+        </Button>
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
@@ -81,11 +104,11 @@ const DiseaseFilters = ({ onFilterChange }: DiseaseFiltersProps) => {
         <div>
           <Select value={category} onValueChange={handleCategoryChange}>
             <SelectTrigger>
-              <SelectValue placeholder="Select Category" />
+              <SelectValue placeholder="Filter by Category" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((cat) => (
+              {categories.map((cat: string) => (
                 <SelectItem key={cat} value={cat.toLowerCase()}>{cat}</SelectItem>
               ))}
             </SelectContent>
@@ -103,7 +126,7 @@ const DiseaseFilters = ({ onFilterChange }: DiseaseFiltersProps) => {
           </Select>
         </div>
       </div>
-      <div className="mt-4 flex justify-end">
+      <div className="mt-6 flex justify-end">
         <Button onClick={applyFilters}>Apply Filters</Button>
       </div>
     </div>

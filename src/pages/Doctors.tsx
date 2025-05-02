@@ -35,7 +35,7 @@ const Doctors = () => {
   useEffect(() => {
     if (diseaseId && doctorsByDisease) {
       setFilteredDoctors(doctorsByDisease);
-    } else if (allDoctors.length > 0) {
+    } else if (allDoctors && allDoctors.length > 0) {
       setFilteredDoctors(allDoctors);
     }
   }, [diseaseId, doctorsByDisease, allDoctors]);
@@ -44,6 +44,8 @@ const Doctors = () => {
     let doctors = diseaseId && doctorsByDisease 
       ? [...doctorsByDisease] 
       : [...allDoctors];
+    
+    if (!doctors || doctors.length === 0) return;
     
     let result = [...doctors];
     
@@ -103,7 +105,7 @@ const Doctors = () => {
   // Fix doctor name to not have duplicate "Dr."
   const formatDoctorName = (name: string) => {
     // Check if name already starts with Dr.
-    if (name.startsWith('Dr.')) {
+    if (name.toLowerCase().startsWith('dr.') || name.toLowerCase().startsWith('dr ')) {
       return name; // Already has Dr., return as is
     } else {
       return `Dr. ${name}`; // Add Dr. if it doesn't have it

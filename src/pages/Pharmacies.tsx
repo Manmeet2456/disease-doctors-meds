@@ -36,7 +36,7 @@ const Pharmacies = () => {
   useEffect(() => {
     if (medicineId && pharmaciesByMedicine) {
       setFilteredPharmacies(pharmaciesByMedicine);
-    } else if (pharmacies) {
+    } else if (pharmacies && pharmacies.length > 0) {
       setFilteredPharmacies(pharmacies);
     }
   }, [pharmacies, medicineId, pharmaciesByMedicine]);
@@ -53,6 +53,8 @@ const Pharmacies = () => {
     let result = medicineId && pharmaciesByMedicine 
       ? [...pharmaciesByMedicine] 
       : [...pharmacies];
+    
+    if (!result || result.length === 0) return;
     
     // Apply search term filter
     if (searchTerm) {
@@ -85,7 +87,7 @@ const Pharmacies = () => {
     // Reset to original data
     if (medicineId && pharmaciesByMedicine) {
       setFilteredPharmacies(pharmaciesByMedicine);
-    } else {
+    } else if (pharmacies && pharmacies.length > 0) {
       setFilteredPharmacies(pharmacies);
     }
     

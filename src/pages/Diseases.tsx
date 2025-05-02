@@ -11,6 +11,11 @@ import { fetchDiseases } from '@/services/supabase';
 const Diseases = () => {
   const [searchParams] = useSearchParams();
   const [filteredDiseases, setFilteredDiseases] = useState<any[]>([]);
+  const [initialFilters, setInitialFilters] = useState({
+    searchTerm: '',
+    category: 'all',
+    sortBy: 'name-asc'
+  });
   
   // Fetch diseases from Supabase
   const { data: diseases = [], isLoading } = useQuery({
@@ -22,18 +27,24 @@ const Diseases = () => {
     // Apply category filter from URL if present
     const categoryFromUrl = searchParams.get('category');
     
-    if (categoryFromUrl && diseases.length > 0) {
+    if (categoryFromUrl && diseases && diseases.length > 0) {
       const filtered = diseases.filter((disease: any) => 
         disease.category.toLowerCase() === categoryFromUrl.toLowerCase()
       );
       setFilteredDiseases(filtered);
-    } else if (diseases.length > 0) {
+      
+      // Update initial filters
+      setInitialFilters(prev => ({
+        ...prev,
+        category: categoryFromUrl.toLowerCase()
+      }));
+    } else if (diseases && diseases.length > 0) {
       setFilteredDiseases(diseases);
     }
   }, [searchParams, diseases]);
 
   const handleFilterChange = (filters: any) => {
-    if (!diseases.length) return;
+    if (!diseases || !diseases.length) return;
     
     let result = [...diseases];
     
@@ -108,7 +119,7 @@ const Diseases = () => {
           <p className="text-gray-600">Browse our comprehensive database of diseases to learn about symptoms, treatments, and more.</p>
         </div>
         
-        <DiseaseFilters onFilterChange={handleFilterChange} />
+        <DiseaseFilters onFilterChange={handleFilterChange} initialFilters={initialFilters} />
         
         {filteredDiseases.length === 0 ? (
           <div className="bg-white p-8 rounded-lg shadow-md text-center">
