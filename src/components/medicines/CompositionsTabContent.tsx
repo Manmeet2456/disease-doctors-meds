@@ -3,8 +3,7 @@ import React, { useState } from 'react';
 import { Composition } from '@/types/medicine';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Search, X } from 'lucide-react';
 
 interface CompositionsTabContentProps {
   compositions: Composition[] | null;
@@ -19,9 +18,24 @@ const CompositionsTabContent = ({ compositions, onExport, onSelectTab }: Composi
     composition => composition.name.toLowerCase().includes(searchTerm.toLowerCase())
   ) : [];
   
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+  
+  const resetSearch = () => {
+    setSearchTerm('');
+  };
+  
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-      <h3 className="text-lg font-semibold mb-4">Available Compositions</h3>
+      <h3 className="text-lg font-semibold mb-4 flex items-center justify-between">
+        <div className="flex items-center">Available Compositions</div>
+        {searchTerm && (
+          <Button variant="ghost" size="sm" onClick={resetSearch} className="flex items-center gap-1">
+            <X className="h-4 w-4" /> Clear Search
+          </Button>
+        )}
+      </h3>
       
       <div className="mb-6">
         <div className="relative">
@@ -30,7 +44,7 @@ const CompositionsTabContent = ({ compositions, onExport, onSelectTab }: Composi
             placeholder="Search compositions..."
             className="pl-10"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
       </div>
@@ -40,24 +54,27 @@ const CompositionsTabContent = ({ compositions, onExport, onSelectTab }: Composi
           {filteredCompositions.map((composition) => (
             <div
               key={composition.composition_id}
-              className="p-4 border rounded-md hover:bg-primary-50 hover:border-primary transition-colors flex items-center justify-between"
+              className="p-4 border rounded-md hover:bg-primary-50 hover:border-primary transition-colors flex flex-col"
             >
-              <h4 className="font-medium">{composition.name}</h4>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => {
-                  // Set URL parameter for composition filtering
-                  const url = new URL(window.location.href);
-                  url.searchParams.set('composition', composition.composition_id.toString());
-                  window.history.pushState({}, '', url.toString());
-                  
-                  // Switch to the medicines tab
-                  onSelectTab('medicines');
-                }}
-              >
-                View Medicines
-              </Button>
+              <h4 className="font-medium mb-2">{composition.name}</h4>
+              <div className="mt-auto">
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="w-full mt-2"
+                  onClick={() => {
+                    // Set URL parameter for composition filtering
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('composition', composition.composition_id.toString());
+                    window.history.pushState({}, '', url.toString());
+                    
+                    // Switch to the medicines tab
+                    onSelectTab('medicines');
+                  }}
+                >
+                  View Medicines
+                </Button>
+              </div>
             </div>
           ))}
         </div>

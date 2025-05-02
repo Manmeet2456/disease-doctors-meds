@@ -62,8 +62,9 @@ const CompaniesTabContent = ({ companies, onExport, onSelectTab }: CompaniesTabC
                   <span className="text-sm text-gray-500">Rank: {company.rank}</span>
                 )}
                 <Button 
-                  variant="ghost" 
+                  variant="secondary" 
                   size="sm" 
+                  className="w-full mt-2"
                   onClick={() => {
                     // Set URL parameter for company filtering
                     const url = new URL(window.location.href);
