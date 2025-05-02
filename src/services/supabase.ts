@@ -118,7 +118,7 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   const medicineIds = medicineCompositions.map(mc => mc.medicine_id);
   
   // Fetch full medicine details with related disease and company data
-  // Fixed: Use explicit column references and aliases to avoid ambiguity
+  // Use explicit column aliases to avoid ambiguity
   const { data: medicines, error } = await supabase
     .from('medicines')
     .select(`
@@ -129,7 +129,7 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
       rank,
       company_id,
       disease_id,
-      disease:disease_id(disease_id, name),
+      disease:disease(disease_id, name),
       company:company_id(company_id, name)
     `)
     .in('medicine_id', medicineIds);
@@ -139,7 +139,10 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   // Transform data to match Medicine type before returning
   return medicines.map(med => ({
     ...med,
-    disease: med.disease || null,
+    disease: med.disease ? {
+      disease_id: med.disease.disease_id,
+      name: med.disease.name
+    } : null,
     company: med.company || null
   }));
 };
@@ -223,7 +226,7 @@ export const fetchMedicineById = async (medicineId: number) => {
       rank,
       company_id,
       disease_id,
-      disease:disease_id(disease_id, name),
+      disease:disease(disease_id, name),
       company:company_id(company_id, name)
     `)
     .eq('medicine_id', medicineId)
@@ -234,7 +237,10 @@ export const fetchMedicineById = async (medicineId: number) => {
   // Transform data to match Medicine type before returning
   return {
     ...data,
-    disease: data.disease || null,
+    disease: data.disease ? {
+      disease_id: data.disease.disease_id,
+      name: data.disease.name
+    } : null,
     company: data.company || null
   };
 };
@@ -281,7 +287,7 @@ export const fetchMedicines = async () => {
       rank,
       company_id,
       disease_id,
-      disease:disease_id(disease_id, name),
+      disease:disease(disease_id, name),
       company:company_id(company_id, name)
     `)
     .order('name');
@@ -291,7 +297,10 @@ export const fetchMedicines = async () => {
   // Transform data to match Medicine type before returning
   return data.map(med => ({
     ...med,
-    disease: med.disease || null,
+    disease: med.disease ? {
+      disease_id: med.disease.disease_id,
+      name: med.disease.name
+    } : null,
     company: med.company || null
   }));
 };

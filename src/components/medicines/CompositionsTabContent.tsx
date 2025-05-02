@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Search, X } from 'lucide-react';
 
 interface CompositionsTabContentProps {
-  compositions: Composition[] | null;
+  compositions: Composition[];
   onExport: () => void;
   onSelectTab: (tab: string) => void;
 }

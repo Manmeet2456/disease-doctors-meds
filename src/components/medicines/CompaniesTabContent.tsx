@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Search, X } from 'lucide-react';
 
 interface CompaniesTabContentProps {
-  companies: Company[] | null;
+  companies: Company[];
   onExport: () => void;
   onSelectTab: (tab: string) => void;
 }
