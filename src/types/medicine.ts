@@ -5,9 +5,9 @@ export interface Medicine {
   type: string | null;
   price: number | null;
   rank: number | null;
-  disease_id: number | null;
+  disease_id: string | null;
   disease: { 
-    disease_id: number;
+    disease_id: string;
     name: string;
   } | null;
   company_id: number | null;

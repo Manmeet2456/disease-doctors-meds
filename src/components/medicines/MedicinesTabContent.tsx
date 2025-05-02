@@ -43,7 +43,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
       const diseaseId = searchParams.get('disease');
       if (diseaseId) {
         const filtered = medicines.filter(medicine => 
-          medicine.disease_id === parseInt(diseaseId)
+          medicine.disease_id === diseaseId
         );
         setFilteredMedicines(filtered);
       } else if (compositionId && medicinesByComposition) {
@@ -82,13 +82,13 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
     if (!medicines) return;
     
     // Start with the appropriate base dataset
-    let result;
+    let result: Medicine[];
     
     // If we have a disease filter from URL
     const diseaseId = searchParams.get('disease');
     if (diseaseId) {
       result = medicines.filter(medicine => 
-        medicine.disease_id === parseInt(diseaseId)
+        medicine.disease_id === diseaseId
       );
     } else {
       result = [...medicines];

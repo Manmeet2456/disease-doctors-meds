@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,7 @@ import { User, Info, PillIcon } from 'lucide-react';
 
 interface DiseaseCardProps {
   disease: {
-    disease_id: number;
+    disease_id: string;
     name: string;
     description: string | null;
     symptoms: string | null;

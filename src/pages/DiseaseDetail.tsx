@@ -9,7 +9,7 @@ import { fetchDiseaseById } from '@/services/supabase';
 
 const DiseaseDetailPage = () => {
   const { id } = useParams();
-  const diseaseId = parseInt(id || '0');
+  const diseaseId = id || '0';
   
   const { data: disease, isLoading } = useQuery({
     queryKey: ['disease', diseaseId],
@@ -53,7 +53,7 @@ const DiseaseDetailPage = () => {
   }
 
   // Function to get random image for disease
-  const getDiseaseImage = (id: number) => {
+  const getDiseaseImage = (id: string) => {
     const images = [
       'https://images.unsplash.com/photo-1579154204601-01588f351e67?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
       'https://images.unsplash.com/photo-1576671103204-2c1e88a7df26?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
@@ -62,7 +62,9 @@ const DiseaseDetailPage = () => {
       'https://images.unsplash.com/photo-1599046512177-6195e9837993?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
       'https://images.unsplash.com/photo-1609207825181-51aaf4dd2094?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80'
     ];
-    return images[id % images.length];
+    // Use hash of the string ID to get a consistent index
+    const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return images[hash % images.length];
   };
 
   return (

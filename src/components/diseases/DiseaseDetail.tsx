@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
@@ -7,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface DiseaseDetailProps {
   disease: {
-    disease_id: number;
+    disease_id: string;
     name: string;
     description: string | null;
     symptoms: string | null;

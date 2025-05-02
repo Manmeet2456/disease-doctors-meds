@@ -1,5 +1,5 @@
-
 import { supabase } from "@/integrations/supabase/client";
+import { Medicine } from "@/types/medicine";
 
 // Update the supabase.ts file to add a function to fetch doctor specializations
 export const fetchDoctorSpecializations = async () => {
@@ -129,7 +129,7 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   const medicinesWithRelations = await Promise.all(
     medicines.map(async (med) => {
       // Create a base medicine object
-      let medicineData = {
+      let medicineData: any = {
         medicine_id: med.medicine_id,
         name: med.name,
         type: med.type,
@@ -137,15 +137,15 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
         rank: med.rank,
         company_id: med.company_id,
         disease_id: med.disease_id,
-        disease: null as any,
-        company: null as any
+        disease: null,
+        company: null
       };
       
       // Fetch disease data if available
       if (med.disease_id) {
         const { data: disease } = await supabase
           .from('disease')
-          .select('*')
+          .select('disease_id, name')
           .eq('disease_id', med.disease_id)
           .single();
         
@@ -161,7 +161,7 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
       if (med.company_id) {
         const { data: company } = await supabase
           .from('companies')
-          .select('*')
+          .select('company_id, name')
           .eq('company_id', med.company_id)
           .single();
         
@@ -177,11 +177,11 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
     })
   );
   
-  return medicinesWithRelations;
+  return medicinesWithRelations as Medicine[];
 };
 
 // Fetch disease by ID
-export const fetchDiseaseById = async (diseaseId: number) => {
+export const fetchDiseaseById = async (diseaseId: string) => {
   const { data, error } = await supabase
     .from('disease')
     .select('*')
@@ -206,7 +206,7 @@ export const fetchDiseases = async () => {
 };
 
 // Fetch doctors by disease
-export const fetchDoctorsByDisease = async (diseaseId: number) => {
+export const fetchDoctorsByDisease = async (diseaseId: string) => {
   if (!diseaseId) return [];
   
   // Get doctor IDs treating this disease
@@ -261,7 +261,7 @@ export const fetchMedicineById = async (medicineId: number) => {
   if (error) throw error;
   
   // Create a base medicine object
-  let medicineData = {
+  let medicineData: any = {
     medicine_id: medicine.medicine_id,
     name: medicine.name,
     type: medicine.type,
@@ -269,15 +269,15 @@ export const fetchMedicineById = async (medicineId: number) => {
     rank: medicine.rank,
     company_id: medicine.company_id,
     disease_id: medicine.disease_id,
-    disease: null as any,
-    company: null as any
+    disease: null,
+    company: null
   };
   
   // Get associated disease data if available
   if (medicine.disease_id) {
     const { data: disease } = await supabase
       .from('disease')
-      .select('*')
+      .select('disease_id, name')
       .eq('disease_id', medicine.disease_id)
       .single();
     
@@ -293,7 +293,7 @@ export const fetchMedicineById = async (medicineId: number) => {
   if (medicine.company_id) {
     const { data: company } = await supabase
       .from('companies')
-      .select('*')
+      .select('company_id, name')
       .eq('company_id', medicine.company_id)
       .single();
     
@@ -305,7 +305,7 @@ export const fetchMedicineById = async (medicineId: number) => {
     }
   }
   
-  return medicineData;
+  return medicineData as Medicine;
 };
 
 // Fetch medicine compositions
@@ -352,7 +352,7 @@ export const fetchMedicines = async () => {
   const medicinesWithRelations = await Promise.all(
     medicines.map(async (med) => {
       // Create a base medicine object
-      let medicineData = {
+      let medicineData: any = {
         medicine_id: med.medicine_id,
         name: med.name,
         type: med.type,
@@ -360,15 +360,15 @@ export const fetchMedicines = async () => {
         rank: med.rank,
         company_id: med.company_id,
         disease_id: med.disease_id,
-        disease: null as any,
-        company: null as any
+        disease: null,
+        company: null
       };
       
       // Fetch disease data if available
       if (med.disease_id) {
         const { data: disease } = await supabase
           .from('disease')
-          .select('*')
+          .select('disease_id, name')
           .eq('disease_id', med.disease_id)
           .single();
         
@@ -384,7 +384,7 @@ export const fetchMedicines = async () => {
       if (med.company_id) {
         const { data: company } = await supabase
           .from('companies')
-          .select('*')
+          .select('company_id, name')
           .eq('company_id', med.company_id)
           .single();
         
@@ -400,7 +400,7 @@ export const fetchMedicines = async () => {
     })
   );
   
-  return medicinesWithRelations;
+  return medicinesWithRelations as Medicine[];
 };
 
 // Fetch all pharmacies
