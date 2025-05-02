@@ -205,7 +205,7 @@ export const fetchDiseases = async () => {
   return data;
 };
 
-// Fetch doctors by disease
+// Update the fetchDoctorsByDisease function to accept a string parameter
 export const fetchDoctorsByDisease = async (diseaseId: string) => {
   if (!diseaseId) return [];
   

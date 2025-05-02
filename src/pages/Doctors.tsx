@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
@@ -18,7 +17,8 @@ const Doctors = () => {
     specialization: 'all'
   });
   
-  const diseaseId = searchParams.get('disease') ? parseInt(searchParams.get('disease') || '0') : null;
+  // Get disease ID from URL parameters and ensure it's a string
+  const diseaseId = searchParams.get('disease') || null;
   
   // Fetch all doctors
   const { data: allDoctors = [], isLoading: isLoadingAllDoctors } = useQuery({
@@ -29,7 +29,7 @@ const Doctors = () => {
   // Fetch doctors by disease if disease ID is provided
   const { data: doctorsByDisease, isLoading: isLoadingByDisease } = useQuery({
     queryKey: ['doctorsByDisease', diseaseId],
-    queryFn: () => fetchDoctorsByDisease(diseaseId || 0),
+    queryFn: () => fetchDoctorsByDisease(diseaseId || ''),
     enabled: diseaseId !== null
   });
   
