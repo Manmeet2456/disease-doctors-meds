@@ -117,40 +117,55 @@ export const fetchMedicinesByComposition = async (compositionId: number) => {
   // Extract medicine IDs
   const medicineIds = medicineCompositions.map(mc => mc.medicine_id);
   
-  // Corrected query that properly separates the relationship
+  // Fix the query by using the foreign key directly instead of trying to join
   const { data: medicines, error } = await supabase
     .from('medicines')
-    .select(`
-      *,
-      disease:disease_id (
-        disease_id,
-        name
-      ),
-      company:company_id (
-        company_id,
-        name
-      )
-    `)
+    .select('*')
     .in('medicine_id', medicineIds);
   
   if (error) throw error;
   
-  // Transform data to match Medicine type before returning
-  const transformedMedicines = medicines.map(med => {
-    return {
-      medicine_id: med.medicine_id,
-      name: med.name,
-      type: med.type,
-      price: med.price,
-      rank: med.rank,
-      company_id: med.company_id,
-      disease_id: med.disease_id,
-      disease: med.disease || null,
-      company: med.company || null
-    };
-  });
+  // Get associated disease and company data separately
+  const medicinesWithRelations = await Promise.all(
+    medicines.map(async (med) => {
+      let diseaseData = null;
+      let companyData = null;
+      
+      if (med.disease_id) {
+        const { data: disease } = await supabase
+          .from('disease')
+          .select('disease_id, name')
+          .eq('disease_id', med.disease_id)
+          .single();
+        
+        diseaseData = disease || null;
+      }
+      
+      if (med.company_id) {
+        const { data: company } = await supabase
+          .from('companies')
+          .select('company_id, name')
+          .eq('company_id', med.company_id)
+          .single();
+        
+        companyData = company || null;
+      }
+      
+      return {
+        medicine_id: med.medicine_id,
+        name: med.name,
+        type: med.type,
+        price: med.price,
+        rank: med.rank,
+        company_id: med.company_id,
+        disease_id: med.disease_id,
+        disease: diseaseData,
+        company: companyData
+      };
+    })
+  );
   
-  return transformedMedicines;
+  return medicinesWithRelations;
 };
 
 // Fetch disease by ID
@@ -222,38 +237,53 @@ export const fetchDoctors = async () => {
 
 // Fetch medicine by ID
 export const fetchMedicineById = async (medicineId: number) => {
-  const { data, error } = await supabase
+  if (!medicineId) return null;
+  
+  // Get the medicine data
+  const { data: medicine, error } = await supabase
     .from('medicines')
-    .select(`
-      *,
-      disease:disease_id (
-        disease_id,
-        name
-      ),
-      company:company_id (
-        company_id,
-        name
-      )
-    `)
+    .select('*')
     .eq('medicine_id', medicineId)
     .single();
   
   if (error) throw error;
   
-  // Transform data to match Medicine type
-  const transformedMedicine = {
-    medicine_id: data.medicine_id,
-    name: data.name,
-    type: data.type,
-    price: data.price,
-    rank: data.rank,
-    company_id: data.company_id,
-    disease_id: data.disease_id,
-    disease: data.disease || null,
-    company: data.company || null
-  };
+  // Get associated disease data if available
+  let diseaseData = null;
+  if (medicine.disease_id) {
+    const { data: disease } = await supabase
+      .from('disease')
+      .select('disease_id, name')
+      .eq('disease_id', medicine.disease_id)
+      .single();
+    
+    diseaseData = disease || null;
+  }
   
-  return transformedMedicine;
+  // Get associated company data if available
+  let companyData = null;
+  if (medicine.company_id) {
+    const { data: company } = await supabase
+      .from('companies')
+      .select('company_id, name')
+      .eq('company_id', medicine.company_id)
+      .single();
+    
+    companyData = company || null;
+  }
+  
+  // Transform data to match Medicine type
+  return {
+    medicine_id: medicine.medicine_id,
+    name: medicine.name,
+    type: medicine.type,
+    price: medicine.price,
+    rank: medicine.rank,
+    company_id: medicine.company_id,
+    disease_id: medicine.disease_id,
+    disease: diseaseData,
+    company: companyData
+  };
 };
 
 // Fetch medicine compositions
@@ -288,39 +318,55 @@ export const fetchMedicineCompositions = async (medicineId: number) => {
 
 // Fetch all medicines
 export const fetchMedicines = async () => {
-  const { data, error } = await supabase
+  // Get all medicines
+  const { data: medicines, error } = await supabase
     .from('medicines')
-    .select(`
-      *,
-      disease:disease_id (
-        disease_id,
-        name
-      ),
-      company:company_id (
-        company_id,
-        name
-      )
-    `)
+    .select('*')
     .order('name');
   
   if (error) throw error;
   
-  // Transform data to match Medicine type
-  const transformedMedicines = data.map(med => {
-    return {
-      medicine_id: med.medicine_id,
-      name: med.name,
-      type: med.type,
-      price: med.price,
-      rank: med.rank,
-      company_id: med.company_id,
-      disease_id: med.disease_id,
-      disease: med.disease || null,
-      company: med.company || null
-    };
-  });
+  // Get associated disease and company data for each medicine
+  const medicinesWithRelations = await Promise.all(
+    medicines.map(async (med) => {
+      let diseaseData = null;
+      let companyData = null;
+      
+      if (med.disease_id) {
+        const { data: disease } = await supabase
+          .from('disease')
+          .select('disease_id, name')
+          .eq('disease_id', med.disease_id)
+          .single();
+        
+        diseaseData = disease || null;
+      }
+      
+      if (med.company_id) {
+        const { data: company } = await supabase
+          .from('companies')
+          .select('company_id, name')
+          .eq('company_id', med.company_id)
+          .single();
+        
+        companyData = company || null;
+      }
+      
+      return {
+        medicine_id: med.medicine_id,
+        name: med.name,
+        type: med.type,
+        price: med.price,
+        rank: med.rank,
+        company_id: med.company_id,
+        disease_id: med.disease_id,
+        disease: diseaseData,
+        company: companyData
+      };
+    })
+  );
   
-  return transformedMedicines;
+  return medicinesWithRelations;
 };
 
 // Fetch all pharmacies

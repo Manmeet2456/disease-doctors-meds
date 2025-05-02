@@ -47,6 +47,7 @@ const MedicinesTabContent = ({ medicines, isLoading, onExport }: MedicinesTabCon
         setFilteredMedicines(filtered);
       } else if (compositionId && medicinesByComposition) {
         // If we have a composition filter from URL, use the fetched medicines
+        // We need to cast because we fixed the return type in the function
         setFilteredMedicines(medicinesByComposition as Medicine[]);
       } else if (companyId) {
         // Filter by company if company ID is in URL

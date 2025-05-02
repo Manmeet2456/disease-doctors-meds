@@ -124,6 +124,9 @@ const Medicines = () => {
     );
   }
 
+  // Cast medicines to the correct type since we've fixed the fetching function
+  const typedMedicines = medicines as Medicine[];
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
@@ -144,7 +147,7 @@ const Medicines = () => {
           
           <TabsContent value="medicines">
             <MedicinesTabContent 
-              medicines={medicines as Medicine[]}
+              medicines={typedMedicines}
               isLoading={isLoadingMedicines}
               onExport={handleExport}
             />
