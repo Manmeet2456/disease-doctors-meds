@@ -171,6 +171,13 @@ export type Database = {
             referencedColumns: ["company_id"]
           },
           {
+            foreignKeyName: "medicines_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_public"
+            referencedColumns: ["company_id"]
+          },
+          {
             foreignKeyName: "medicines_disease_id_fkey"
             columns: ["disease_id"]
             isOneToOne: false
@@ -237,6 +244,13 @@ export type Database = {
             referencedRelation: "pharmacies"
             referencedColumns: ["pharmacy_id"]
           },
+          {
+            foreignKeyName: "stock_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "pharmacies_public"
+            referencedColumns: ["pharmacy_id"]
+          },
         ]
       }
       treated_by: {
@@ -267,11 +281,77 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["doctor_id"]
           },
+          {
+            foreignKeyName: "treated_by_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
+            referencedColumns: ["doctor_id"]
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      companies_public: {
+        Row: {
+          company_id: number | null
+          name: string | null
+          rank: number | null
+        }
+        Insert: {
+          company_id?: number | null
+          name?: string | null
+          rank?: number | null
+        }
+        Update: {
+          company_id?: number | null
+          name?: string | null
+          rank?: number | null
+        }
+        Relationships: []
+      }
+      doctors_public: {
+        Row: {
+          doctor_id: number | null
+          experience_years: number | null
+          hospital: string | null
+          name: string | null
+          specialization: string | null
+        }
+        Insert: {
+          doctor_id?: number | null
+          experience_years?: number | null
+          hospital?: string | null
+          name?: string | null
+          specialization?: string | null
+        }
+        Update: {
+          doctor_id?: number | null
+          experience_years?: number | null
+          hospital?: string | null
+          name?: string | null
+          specialization?: string | null
+        }
+        Relationships: []
+      }
+      pharmacies_public: {
+        Row: {
+          location: string | null
+          name: string | null
+          pharmacy_id: number | null
+        }
+        Insert: {
+          location?: string | null
+          name?: string | null
+          pharmacy_id?: number | null
+        }
+        Update: {
+          location?: string | null
+          name?: string | null
+          pharmacy_id?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
