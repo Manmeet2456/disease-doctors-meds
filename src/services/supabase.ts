@@ -1,10 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Medicine } from "@/types/medicine";
 
-// Update the supabase.ts file to add a function to fetch doctor specializations
+// Update the supabase.ts file to add a function to fetch doctor specializations (using public view)
 export const fetchDoctorSpecializations = async () => {
   const { data, error } = await supabase
-    .from('doctors')
+    .from('doctors_public')
     .select('specialization')
     .not('specialization', 'is', null)
     .order('specialization');
@@ -205,7 +205,7 @@ export const fetchDiseases = async () => {
   return data;
 };
 
-// Update the fetchDoctorsByDisease function to accept a string parameter
+// Update the fetchDoctorsByDisease function to accept a string parameter (using public view)
 export const fetchDoctorsByDisease = async (diseaseId: string) => {
   if (!diseaseId) return [];
   
@@ -224,9 +224,9 @@ export const fetchDoctorsByDisease = async (diseaseId: string) => {
   // Extract doctor IDs
   const doctorIds = treatedBy.map(tb => tb.doctor_id);
   
-  // Fetch full doctor details
+  // Fetch doctor details from public view to protect contact information
   const { data: doctors, error } = await supabase
-    .from('doctors')
+    .from('doctors_public')
     .select('*')
     .in('doctor_id', doctorIds);
   
@@ -235,10 +235,10 @@ export const fetchDoctorsByDisease = async (diseaseId: string) => {
   return doctors;
 };
 
-// Fetch all doctors
+// Fetch all doctors (using public view to protect contact information)
 export const fetchDoctors = async () => {
   const { data, error } = await supabase
-    .from('doctors')
+    .from('doctors_public')
     .select('*')
     .order('name');
   
